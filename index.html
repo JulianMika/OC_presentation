@@ -15,16 +15,13 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&family=Saira+Stencil+One&display=swap"
       rel="stylesheet"
     />
     <script>
       (function () {
-        var theme = localStorage.getItem("oc-theme");
         var lang = localStorage.getItem("oc-lang");
-        if (theme === "black" || theme === "white") {
-          document.documentElement.dataset.theme = theme;
-        }
+        document.documentElement.dataset.theme = "white";
         if (lang === "de" || lang === "en") {
           document.documentElement.dataset.lang = lang;
           document.documentElement.lang = lang === "de" ? "de" : "en";
@@ -33,9 +30,36 @@
       })();
     </script>
     <style>
+      @font-face {
+        font-family: "Bauhaus 93";
+        src: local("Bauhaus 93"), local("Bauhaus93"), local("Bauhaus 93 Regular");
+        font-weight: 400;
+        font-style: normal;
+        font-display: swap;
+      }
+
+      @font-face {
+        font-family: "Inter OC";
+        font-style: normal;
+        font-weight: 500;
+        font-display: swap;
+        src: url("https://fonts.gstatic.com/s/inter/v20/UcCO3FwrK3iLTeHuS_nVMrMxCp50SjIw2boKoduKmMEVuI6fAZ9hiJ-Ek-_EeA.woff2") format("woff2");
+        unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+      }
+
+      @font-face {
+        font-family: "Inter OC";
+        font-style: normal;
+        font-weight: 700;
+        font-display: swap;
+        src: url("https://fonts.gstatic.com/s/inter/v20/UcCO3FwrK3iLTeHuS_nVMrMxCp50SjIw2boKoduKmMEVuFuYAZ9hiJ-Ek-_EeA.woff2") format("woff2");
+        unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+      }
+
       :root {
         --widget: #fff;
         --ink: #111;
+        --glass: rgba(255, 255, 255, 0.48);
         --shadow: 0 10px 28px rgba(0, 0, 0, 0.18);
         --sans: "Inter", sans-serif;
         --app-height: 100dvh;
@@ -66,7 +90,6 @@
         overflow: hidden;
         color: var(--ink);
         font-family: var(--sans);
-        -webkit-font-smoothing: antialiased;
       }
 
       .bg {
@@ -76,41 +99,6 @@
         overflow: hidden;
         background: #1d2a1c url("assets/background.jpg") center / cover no-repeat;
         pointer-events: none;
-      }
-
-      .bg-points {
-        position: absolute;
-        inset: 0;
-        z-index: 0;
-        pointer-events: none;
-      }
-
-      .bg-points span {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 18.2px;
-        height: 18.2px;
-        background: rgba(255, 255, 255, 0.72);
-        border-radius: 50%;
-        will-change: transform;
-      }
-
-      .point-line {
-        position: absolute;
-        inset: 0;
-        z-index: 1;
-        width: 100%;
-        height: 100%;
-        pointer-events: none;
-      }
-
-      .point-line polyline {
-        fill: none;
-        stroke: rgba(255, 255, 255, 0.72);
-        stroke-width: 3;
-        stroke-linecap: round;
-        stroke-linejoin: round;
       }
 
       .slides {
@@ -144,91 +132,122 @@
       }
 
       .chrome {
-        position: absolute;
-        z-index: 1;
+        position: fixed;
+        z-index: 2;
         top: 0;
         left: 0;
         right: 0;
         display: flex;
-        align-items: flex-start;
-        justify-content: space-between;
+        align-items: center;
+        justify-content: flex-end;
         gap: 0.75rem;
+        height: calc(1.1rem + env(safe-area-inset-top, 0px) + 2.75rem);
         padding:
           calc(1.1rem + env(safe-area-inset-top, 0px))
-          calc(1rem + env(safe-area-inset-right, 0px))
+          calc(0.9rem + env(safe-area-inset-right, 0px))
           0
-          calc(1rem + env(safe-area-inset-left, 0px));
+          calc(0.9rem + env(safe-area-inset-left, 0px));
+        pointer-events: none;
       }
 
-      .switch {
+      .lang-wrap {
+        position: relative;
+        z-index: 3;
+        pointer-events: auto;
         display: flex;
-        gap: 0.15rem;
-        padding: 0.22rem;
-        background: var(--widget);
-        color: var(--ink);
-        border-radius: 999px;
-        box-shadow: var(--shadow);
       }
 
-      .switch button {
-        border: 0;
-        background: transparent;
-        color: inherit;
-        border-radius: 999px;
-        min-height: 2.75rem;
-        padding: 0.42rem 0.85rem;
-        font: inherit;
-        font-size: 0.82rem;
-        font-weight: 600;
+      .lang-button,
+      .lang-option {
+        appearance: none;
+        -webkit-appearance: none;
+        display: inline-block;
+        box-sizing: border-box;
+        width: max-content;
+        max-width: 100%;
+        padding: 0.55rem 1.15rem;
+        color: #111;
+        font-family: "Inter OC", "Inter", system-ui, sans-serif;
+        font-size: 0.95rem;
+        font-weight: 500;
+        font-optical-sizing: none;
+        -webkit-font-smoothing: auto;
         letter-spacing: 0.01em;
+        text-align: left;
+        background: var(--glass);
+        border: none;
+        border-radius: 999px;
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
         cursor: pointer;
         touch-action: manipulation;
         -webkit-tap-highlight-color: transparent;
         user-select: none;
       }
 
-      .switch button[aria-pressed="true"] {
-        background: var(--ink);
-        color: var(--widget);
+      .lang-button {
+        height: 2.55rem;
+        padding-top: 0;
+        padding-bottom: 0;
       }
 
-      .theme-button {
-        display: grid;
-        place-items: center;
-        width: 2.75rem;
-        height: 2.75rem;
+      .lang-wrap.is-open .lang-button,
+      .lang-option:hover,
+      .lang-option:active,
+      .lang-option:focus-visible,
+      .lang-option.is-active {
+        background: #fff;
+        backdrop-filter: none;
+        -webkit-backdrop-filter: none;
+        outline: none;
+      }
+
+      .lang-menu {
+        position: absolute;
+        top: calc(100% + 0.55rem);
+        left: 0;
+        z-index: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        width: max-content;
+        gap: 0.45rem;
+        margin: 0;
         padding: 0;
-        border: 0;
-        border-radius: 50%;
-        background: var(--widget);
-        color: var(--ink);
-        box-shadow: var(--shadow);
-        cursor: pointer;
-        touch-action: manipulation;
-        -webkit-tap-highlight-color: transparent;
-        user-select: none;
+        list-style: none;
       }
 
-      .theme-button svg {
-        width: 1.15rem;
-        height: 1.15rem;
-        display: block;
+      html.lang-open .slides {
+        visibility: hidden;
+        opacity: 0;
+        pointer-events: none;
       }
 
-      html[data-theme="white"] .theme-button .sun,
-      html[data-theme="black"] .theme-button .moon {
+      .lang-menu[hidden] {
         display: none;
       }
 
-      .theme-button:focus-visible,
-      .switch button:focus-visible {
-        outline: 2px solid var(--ink);
-        outline-offset: 2px;
-      }
+      @media (min-width: 768px) {
+        .chrome {
+          height: calc(1.5rem + env(safe-area-inset-top, 0px) + 3rem);
+          padding:
+            calc(1.5rem + env(safe-area-inset-top, 0px))
+            calc(1.85rem + env(safe-area-inset-right, 0px))
+            0
+            calc(1.85rem + env(safe-area-inset-left, 0px));
+        }
 
-      .switch button:active,
-      .theme-button:active {
-        transform: scale(0.96);
+        .lang-button,
+        .lang-option {
+          padding: 0.65rem 1.35rem;
+          font-size: 1.05rem;
+        }
+
+        .lang-button {
+          height: 2.69rem;
+          padding-top: 0;
+          padding-bottom: 0;
+        }
       }
 
       .lockup {
@@ -237,18 +256,46 @@
         display: flex;
         flex-direction: column;
         align-items: center;
+        width: 100%;
         max-width: 100%;
       }
 
       .logo-widget {
+        position: relative;
+        z-index: 1;
         display: grid;
         place-items: center;
         width: min(46.2vw, 242px);
         aspect-ratio: 1;
         overflow: hidden;
-        background: var(--widget);
+        background: #1d2a1c url("assets/background.jpg") center / cover no-repeat fixed;
         border-radius: 50%;
-        box-shadow: var(--shadow);
+      }
+
+      .logo-row {
+        --name-size: clamp(1.05rem, 2.6vw, 2rem);
+        position: relative;
+        display: flex;
+        align-items: center;
+        gap: 1.15rem;
+        width: max-content;
+        max-width: 100%;
+      }
+
+      .logo-row::before {
+        content: "";
+        position: absolute;
+        z-index: 0;
+        left: -0.7rem;
+        right: -0.7rem;
+        top: 50%;
+        height: calc(1.15 * var(--name-size) + 0.9rem);
+        transform: translateY(-50%);
+        background: var(--glass);
+        border-radius: 0.75rem;
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        pointer-events: none;
       }
 
       .logo-widget img {
@@ -260,8 +307,30 @@
         user-select: none;
       }
 
-      html[data-theme="black"] .logo-widget {
-        background: #000;
+      .logo-name {
+        position: relative;
+        z-index: 1;
+        margin: 0;
+        width: max-content;
+        max-width: 100%;
+        color: #111;
+        font-family: "Saira Stencil One", "Bauhaus 93", sans-serif;
+        font-size: var(--name-size);
+        font-weight: 400;
+        font-synthesis: none;
+        letter-spacing: 0.01em;
+        line-height: 1.15;
+        white-space: nowrap;
+      }
+
+      .logo-name-left {
+        justify-self: end;
+        text-align: right;
+      }
+
+      .logo-name-right {
+        justify-self: start;
+        text-align: left;
       }
 
       html[data-theme="black"] .logo-widget img {
@@ -273,10 +342,11 @@
         width: fit-content;
         max-width: 100%;
         padding: 0.45rem 0.7rem;
-        background: var(--widget);
-        color: var(--ink);
+        background: var(--glass);
+        color: #111;
         border-radius: 0.75rem;
-        box-shadow: var(--shadow);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
         font-family: var(--sans);
         font-size: clamp(1.9rem, 4.4vw, 2.3rem);
         font-weight: 700;
@@ -284,6 +354,12 @@
         line-height: 1.15;
         text-align: center;
         text-wrap: balance;
+      }
+
+      .slogan-mark {
+        font-family: "Saira Stencil One", "Bauhaus 93", sans-serif;
+        font-weight: 400;
+        font-synthesis: none;
       }
 
       .slide-pair {
@@ -366,9 +442,11 @@
         align-items: center;
         justify-content: center;
         min-width: 0;
-        background: var(--widget);
-        color: var(--ink);
+        background: var(--glass);
+        color: #111;
         border-radius: 1.5rem;
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
       }
 
       .timer-widget {
@@ -390,8 +468,8 @@
 
       .timer-value {
         display: block;
-        font-weight: 700;
-        font-variant-numeric: tabular-nums;
+        font-family: "Saira Stencil One", "Bauhaus 93", sans-serif;
+        font-weight: 400;
         font-size: 1em;
         line-height: 1;
       }
@@ -399,6 +477,7 @@
       .timer-label {
         display: block;
         margin-top: 0.048em;
+        font-family: var(--sans);
         font-size: 0.24em;
         font-weight: 600;
         letter-spacing: 0.03em;
@@ -465,8 +544,18 @@
           flex-wrap: wrap;
         }
 
-        .switch button {
-          font-size: 0.75rem;
+        .logo-widget {
+          width: min(32vw, 242px);
+        }
+
+        .logo-row {
+          --name-size: clamp(0.78rem, 3.5vw, 1.15rem);
+        }
+
+        .logo-row::before {
+          left: -0.6rem;
+          right: -0.6rem;
+          height: calc(1.15 * var(--name-size) + 0.8rem);
         }
 
         .slogan {
@@ -485,31 +574,29 @@
   </head>
   <body>
     <div class="bg" aria-hidden="true"></div>
+    <div class="chrome">
+      <div class="lang-wrap" id="lang-switch">
+            <button type="button" class="lang-button" id="lang-button" aria-expanded="false" aria-controls="lang-menu" data-copy="language">Language</button>        <ul class="lang-menu" id="lang-menu" hidden>
+          <li>
+            <button type="button" class="lang-option" data-lang-set="en">English</button>
+          </li>
+          <li>
+            <button type="button" class="lang-option" data-lang-set="de">Deutsch</button>
+          </li>
+        </ul>
+      </div>
+    </div>
     <main class="slides">
       <section class="slide" data-slide="start">
-        <div class="chrome">
-          <button type="button" class="theme-button" id="theme-button" aria-label="Black">
-            <svg class="sun" viewBox="0 0 24 24" aria-hidden="true">
-              <circle cx="12" cy="12" r="4.2" fill="none" stroke="currentColor" stroke-width="2" />
-              <g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
-                <path d="M12 2.5v2.2M12 19.3v2.2M2.5 12h2.2M19.3 12h2.2" />
-                <path d="M5.2 5.2l1.6 1.6M17.2 17.2l1.6 1.6M18.8 5.2l-1.6 1.6M6.8 17.2l-1.6 1.6" />
-              </g>
-            </svg>
-            <svg class="moon" viewBox="0 0 24 24" aria-hidden="true">
-              <path fill="currentColor" d="M15.2 2.8a8.6 8.6 0 1 0 6 12.6 7 7 0 0 1-6-12.6z" />
-            </svg>
-          </button>
-          <div class="switch" role="group" id="lang-switch" aria-label="Language">
-            <button type="button" data-lang-set="en" aria-pressed="true" aria-label="English">EN</button>
-            <button type="button" data-lang-set="de" aria-pressed="false" aria-label="Deutsch">DE</button>
-          </div>
-        </div>
         <div class="lockup">
-          <div class="logo-widget">
-            <img src="assets/logo.png" alt="OC" width="160" height="160" />
+          <div class="logo-row">
+            <p class="logo-name logo-name-left" data-copy="nameLeft">Optimized</p>
+            <div class="logo-widget">
+              <img src="assets/logo.svg" alt="OC" width="160" height="160" />
+            </div>
+            <p class="logo-name logo-name-right" data-copy="nameRight">Consumption</p>
           </div>
-          <p class="slogan" id="slogan">The foundation for human-centric solutions</p>
+          <p class="slogan" id="slogan">The <span class="slogan-mark">Basis</span> for human-centric solutions</p>
         </div>
       </section>
       <section class="slide slide-pair" data-slide="middle-1">
@@ -565,10 +652,10 @@
       (function () {
         var copy = {
           en: {
-            slogan: "The foundation for human-centric solutions",
-            white: "White",
-            black: "Black",
-            mode: "Color mode",
+            slogan: "The Basis for human-centric solutions",
+            nameLeft: "Optimized",
+            nameRight: "Consumption",
+            language: "Language",
             days: "Days",
             hours: "Hours",
             minutes: "Minutes",
@@ -576,10 +663,10 @@
             release: "Release date"
           },
           de: {
-            slogan: "Das Fundament für menschenzentrierte Lösungen",
-            white: "Weiß",
-            black: "Schwarz",
-            mode: "Farbmodus",
+            slogan: "Die Basis für menschenzentrierte Lösungen",
+            nameLeft: "Optimized",
+            nameRight: "Consumption",
+            language: "Sprache",
             days: "Tage",
             hours: "Stunden",
             minutes: "Minuten",
@@ -589,8 +676,9 @@
         };
 
         var root = document.documentElement;
-        var themeButton = document.getElementById("theme-button");
         var langSwitch = document.getElementById("lang-switch");
+        var langButton = document.getElementById("lang-button");
+        var langMenu = document.getElementById("lang-menu");
         var slogan = document.getElementById("slogan");
         var themeMeta = document.querySelector('meta[name="theme-color"]');
 
@@ -602,16 +690,30 @@
           return root.dataset.lang === "de" ? "de" : "en";
         }
 
+        function renderSlogan(text) {
+          slogan.replaceChildren();
+          text.split(/(Basis|basis)/).forEach(function (part) {
+            if (!part) return;
+            if (part === "Basis" || part === "basis") {
+              var mark = document.createElement("span");
+              mark.className = "slogan-mark";
+              mark.textContent = part;
+              slogan.appendChild(mark);
+              return;
+            }
+            slogan.appendChild(document.createTextNode(part));
+          });
+        }
+
         function render() {
           var currentTheme = theme();
           var currentLang = lang();
           var text = copy[currentLang];
 
           root.lang = currentLang === "de" ? "de" : "en";
-          slogan.textContent = text.slogan;
-          themeButton.setAttribute("aria-label", currentTheme === "black" ? text.white : text.black);
-          langSwitch.querySelectorAll("button").forEach(function (button) {
-            button.setAttribute("aria-pressed", String(button.dataset.langSet === currentLang));
+          renderSlogan(text.slogan);
+          langMenu.querySelectorAll("button").forEach(function (button) {
+            button.classList.toggle("is-active", button.dataset.langSet === currentLang);
           });
           document.querySelectorAll("[data-copy]").forEach(function (node) {
             node.textContent = text[node.dataset.copy];
@@ -634,34 +736,64 @@
         }
 
         function fitSlogan() {
-          slogan.style.width = "";
-          var style = getComputedStyle(slogan);
-          var pad = parseFloat(style.paddingLeft) + parseFloat(style.paddingRight);
-          var range = document.createRange();
-          range.selectNodeContents(slogan);
-          var before = lineMetrics(range);
-          if (!before.widest) return;
           var slide = slogan.closest(".slide");
           var slideStyle = getComputedStyle(slide);
           var available =
             slide.clientWidth -
             parseFloat(slideStyle.paddingLeft) -
             parseFloat(slideStyle.paddingRight);
-          var next = Math.min(Math.ceil(before.widest + pad + 1), available);
-          slogan.style.width = next + "px";
-          var after = lineMetrics(range);
-          if (after.count > before.count || after.widest > next - pad + 1) {
-            slogan.style.width = available + "px";
+
+          var probe = slogan.cloneNode(true);
+          probe.style.cssText =
+            "position:fixed;left:0;top:0;visibility:hidden;width:max-content;max-width:none;white-space:nowrap;";
+          document.body.appendChild(probe);
+          var single = probe.getBoundingClientRect().width;
+          probe.remove();
+
+          if (single + 1 <= available) {
+            slogan.style.width = Math.ceil(single + 1) + "px";
+            return;
           }
+
+          slogan.style.width = available + "px";
+          var style = getComputedStyle(slogan);
+          var pad = parseFloat(style.paddingLeft) + parseFloat(style.paddingRight);
+          var range = document.createRange();
+          range.selectNodeContents(slogan);
+          var wrapped = lineMetrics(range);
+          if (!wrapped.widest) return;
+          slogan.style.width = Math.min(Math.ceil(wrapped.widest + pad + 1), available) + "px";
         }
 
         function lineMetrics(range) {
           var rects = range.getClientRects();
-          var widest = 0;
+          var lines = [];
           for (var i = 0; i < rects.length; i++) {
-            if (rects[i].width > widest) widest = rects[i].width;
+            var rect = rects[i];
+            if (rect.width <= 0 || rect.height <= 0) continue;
+            var line = null;
+            for (var j = 0; j < lines.length; j++) {
+              var overlap = Math.min(lines[j].bottom, rect.bottom) - Math.max(lines[j].top, rect.top);
+              if (overlap > Math.min(lines[j].bottom - lines[j].top, rect.height) * 0.5) {
+                line = lines[j];
+                break;
+              }
+            }
+            if (!line) {
+              lines.push({ top: rect.top, bottom: rect.bottom, left: rect.left, right: rect.right });
+              continue;
+            }
+            line.top = Math.min(line.top, rect.top);
+            line.bottom = Math.max(line.bottom, rect.bottom);
+            line.left = Math.min(line.left, rect.left);
+            line.right = Math.max(line.right, rect.right);
           }
-          return { widest: widest, count: rects.length };
+          var widest = 0;
+          for (var k = 0; k < lines.length; k++) {
+            var width = lines[k].right - lines[k].left;
+            if (width > widest) widest = width;
+          }
+          return { widest: widest, count: lines.length };
         }
 
         window.addEventListener("resize", syncViewport);
@@ -689,333 +821,36 @@
           }
         }
 
-        themeButton.addEventListener("click", function () {
-          root.dataset.theme = theme() === "black" ? "white" : "black";
-          localStorage.setItem("oc-theme", theme());
-          render();
+        function setLangOpen(open) {
+          langSwitch.classList.toggle("is-open", open);
+          root.classList.toggle("lang-open", open);
+          langButton.setAttribute("aria-expanded", String(open));
+          langMenu.hidden = !open;
+        }
+
+        langButton.addEventListener("click", function (event) {
+          event.stopPropagation();
+          setLangOpen(langMenu.hidden);
         });
 
-        langSwitch.addEventListener("click", function (event) {
+        langMenu.addEventListener("click", function (event) {
           var button = event.target.closest("button");
           if (!button) return;
           root.dataset.lang = button.dataset.langSet;
           localStorage.setItem("oc-lang", lang());
+          setLangOpen(false);
           render();
         });
 
+        document.addEventListener("click", function (event) {
+          if (!langSwitch.contains(event.target)) setLangOpen(false);
+        });
+
+        document.addEventListener("keydown", function (event) {
+          if (event.key === "Escape") setLangOpen(false);
+        });
+
         render();
-
-        var pointSize = 18.2;
-        var dots = [];
-        var bg = document.querySelector(".bg");
-        var layer = document.createElement("div");
-        layer.className = "bg-points";
-        bg.appendChild(layer);
-        var maxX = Math.max(0, window.innerWidth - pointSize);
-        var maxY = Math.max(0, window.innerHeight - pointSize);
-        for (var j = 0; j < 100; j++) {
-          var point = document.createElement("span");
-          var speed = (18 + Math.random() * 28) * 0.2;
-          var angle = Math.random() * Math.PI * 2;
-          dots.push({
-            el: point,
-            x: Math.random() * maxX,
-            y: Math.random() * maxY,
-            vx: Math.cos(angle) * speed,
-            vy: Math.sin(angle) * speed
-          });
-          layer.appendChild(point);
-        }
-
-        function separateDots() {
-          var minDist = pointSize;
-          for (var a = 0; a < dots.length; a++) {
-            for (var b = a + 1; b < dots.length; b++) {
-              var dx = dots[b].x - dots[a].x;
-              var dy = dots[b].y - dots[a].y;
-              var dist = Math.hypot(dx, dy);
-              if (dist >= minDist) continue;
-              if (dist < 0.01) {
-                var nudge = Math.random() * Math.PI * 2;
-                dx = Math.cos(nudge);
-                dy = Math.sin(nudge);
-                dist = 0.01;
-              }
-              var overlap = minDist - dist;
-              var nx = dx / dist;
-              var ny = dy / dist;
-              dots[a].x -= nx * overlap * 0.5;
-              dots[a].y -= ny * overlap * 0.5;
-              dots[b].x += nx * overlap * 0.5;
-              dots[b].y += ny * overlap * 0.5;
-              var closing = (dots[a].vx - dots[b].vx) * nx + (dots[a].vy - dots[b].vy) * ny;
-              if (closing > 0) {
-                dots[a].vx -= closing * nx;
-                dots[a].vy -= closing * ny;
-                dots[b].vx += closing * nx;
-                dots[b].vy += closing * ny;
-              }
-            }
-          }
-        }
-
-        function clampDot(dot, limitX, limitY) {
-          if (dot.x < 0) {
-            dot.x = 0;
-            dot.vx = Math.abs(dot.vx);
-          } else if (dot.x > limitX) {
-            dot.x = limitX;
-            dot.vx = -Math.abs(dot.vx);
-          }
-          if (dot.y < 0) {
-            dot.y = 0;
-            dot.vy = Math.abs(dot.vy);
-          } else if (dot.y > limitY) {
-            dot.y = limitY;
-            dot.vy = -Math.abs(dot.vy);
-          }
-        }
-
-        function settleDots() {
-          var limitX = Math.max(0, window.innerWidth - pointSize);
-          var limitY = Math.max(0, window.innerHeight - pointSize);
-          separateDots();
-          for (var n = 0; n < dots.length; n++) clampDot(dots[n], limitX, limitY);
-        }
-
-        for (var pass = 0; pass < 40; pass++) settleDots();
-
-        var lastFrame = 0;
-        function placeDots(now) {
-          var dt = lastFrame ? Math.min(0.05, (now - lastFrame) / 1000) : 0;
-          lastFrame = now;
-          var limitX = Math.max(0, window.innerWidth - pointSize);
-          var limitY = Math.max(0, window.innerHeight - pointSize);
-          for (var n = 0; n < dots.length; n++) {
-            var dot = dots[n];
-            dot.x += dot.vx * dt;
-            dot.y += dot.vy * dt;
-          }
-          settleDots();
-          settleDots();
-          drawLine(now);
-          settleDots();
-          for (var i = 0; i < dots.length; i++) {
-            dots[i].el.style.transform = "translate3d(" + dots[i].x.toFixed(2) + "px," + dots[i].y.toFixed(2) + "px,0)";
-          }
-          requestAnimationFrame(placeDots);
-        }
-
-        var line = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-        line.setAttribute("class", "point-line");
-        line.setAttribute("aria-hidden", "true");
-        var poly = document.createElementNS("http://www.w3.org/2000/svg", "polyline");
-        line.appendChild(poly);
-        bg.appendChild(line);
-
-        function dotCenter(dot) {
-          return {
-            x: dot.x + pointSize / 2,
-            y: dot.y + pointSize / 2
-          };
-        }
-
-        function closestOnSegment(px, py, ax, ay, bx, by) {
-          var abx = bx - ax;
-          var aby = by - ay;
-          var len2 = abx * abx + aby * aby;
-          var t = len2 < 1e-8 ? 0 : ((px - ax) * abx + (py - ay) * aby) / len2;
-          if (t < 0) t = 0;
-          else if (t > 1) t = 1;
-          var cx = ax + abx * t;
-          var cy = ay + aby * t;
-          return {
-            dist: Math.hypot(px - cx, py - cy),
-            t: t,
-            cx: cx,
-            cy: cy,
-            len: Math.sqrt(len2)
-          };
-        }
-
-        var lineClearance = pointSize / 2 + 1.5;
-
-        function segmentBlocked(ax, ay, bx, by, ignoreA, ignoreB) {
-          var span = Math.hypot(bx - ax, by - ay);
-          if (span < 0.5) return true;
-          for (var n = 0; n < dots.length; n++) {
-            var dot = dots[n];
-            if (dot === ignoreA || dot === ignoreB) continue;
-            var center = dotCenter(dot);
-            var hit = closestOnSegment(center.x, center.y, ax, ay, bx, by);
-            if (hit.dist >= lineClearance) continue;
-            if (hit.t * hit.len < pointSize || (1 - hit.t) * hit.len < pointSize) continue;
-            return true;
-          }
-          return false;
-        }
-
-        function pushDotsOffSegment(ax, ay, bx, by, ignoreA, ignoreB) {
-          var span = Math.hypot(bx - ax, by - ay);
-          if (span < 0.5) return;
-          for (var n = 0; n < dots.length; n++) {
-            var dot = dots[n];
-            if (dot === ignoreA || dot === ignoreB) continue;
-            var center = dotCenter(dot);
-            var hit = closestOnSegment(center.x, center.y, ax, ay, bx, by);
-            if (hit.dist >= lineClearance) continue;
-            if (hit.t * hit.len < pointSize || (1 - hit.t) * hit.len < pointSize) continue;
-            var nx;
-            var ny;
-            if (hit.dist < 0.01) {
-              nx = -(by - ay) / span;
-              ny = (bx - ax) / span;
-            } else {
-              nx = (center.x - hit.cx) / hit.dist;
-              ny = (center.y - hit.cy) / hit.dist;
-            }
-            var push = lineClearance - hit.dist;
-            dot.x += nx * push;
-            dot.y += ny * push;
-            var closing = dot.vx * nx + dot.vy * ny;
-            if (closing < 0) {
-              dot.vx -= closing * nx;
-              dot.vy -= closing * ny;
-            }
-          }
-        }
-
-        function pickLine() {
-          var picks = 20 + Math.floor(Math.random() * 21);
-          var path = [];
-          var used = [];
-          var start = dots[Math.floor(Math.random() * dots.length)];
-          path.push(start);
-          used.push(start);
-          while (path.length < picks) {
-            var from = path[path.length - 1];
-            var fromCenter = dotCenter(from);
-            var best = null;
-            var bestScore = -1;
-            for (var n = 0; n < dots.length; n++) {
-              var candidate = dots[n];
-              if (used.indexOf(candidate) !== -1) continue;
-              var toCenter = dotCenter(candidate);
-              var dist = Math.hypot(toCenter.x - fromCenter.x, toCenter.y - fromCenter.y);
-              if (dist < pointSize * 2.5) continue;
-              if (segmentBlocked(fromCenter.x, fromCenter.y, toCenter.x, toCenter.y, from, candidate)) continue;
-              var score = dist + Math.random() * 80;
-              if (score > bestScore) {
-                bestScore = score;
-                best = candidate;
-              }
-            }
-            if (!best) break;
-            path.push(best);
-            used.push(best);
-          }
-          if (path.length < 2) {
-            var fallback = dots.slice().sort(function (a, b) { return a.y - b.y; });
-            return [fallback[0], fallback[fallback.length - 1]];
-          }
-          return path;
-        }
-
-        var lineDots = pickLine();
-        var hopIndex = 0;
-        var covered = 0;
-        var lastDraw = 0;
-
-        function lineTempo() {
-          return Math.min(window.innerWidth, window.innerHeight) * 0.15;
-        }
-
-        function drawLine(now) {
-          var width = window.innerWidth;
-          var height = window.innerHeight;
-          line.setAttribute("viewBox", "0 0 " + width + " " + height);
-          if (lineDots.length < 2) return;
-          if (reduceMotion) {
-            var last = lineDots.length - 1;
-            var a = dotCenter(lineDots[last - 1]);
-            var b = dotCenter(lineDots[last]);
-            poly.setAttribute("points", a.x.toFixed(1) + "," + a.y.toFixed(1) + " " + b.x.toFixed(1) + "," + b.y.toFixed(1));
-            return;
-          }
-          var dt = lastDraw ? Math.min(0.05, (now - lastDraw) / 1000) : 0;
-          lastDraw = now;
-          var step = lineTempo() * dt;
-          var guard = 0;
-          while (guard < 120) {
-            guard++;
-            if (hopIndex >= lineDots.length - 1) {
-              lineDots = pickLine();
-              hopIndex = 0;
-              covered = 0;
-              if (lineDots.length < 2) return;
-            }
-            var fromDot = lineDots[hopIndex];
-            var toDot = lineDots[hopIndex + 1];
-            var from = dotCenter(fromDot);
-            var to = dotCenter(toDot);
-            var dist = Math.hypot(to.x - from.x, to.y - from.y);
-            if (dist < pointSize * 2.5 || segmentBlocked(from.x, from.y, to.x, to.y, fromDot, toDot)) {
-              var swapped = false;
-              for (var look = hopIndex + 2; look < lineDots.length; look++) {
-                var alt = lineDots[look];
-                var altCenter = dotCenter(alt);
-                var altDist = Math.hypot(altCenter.x - from.x, altCenter.y - from.y);
-                if (altDist < pointSize * 2.5) continue;
-                if (segmentBlocked(from.x, from.y, altCenter.x, altCenter.y, fromDot, alt)) continue;
-                lineDots[hopIndex + 1] = alt;
-                swapped = true;
-                break;
-              }
-              if (!swapped) {
-                hopIndex += 1;
-                covered = 0;
-                continue;
-              }
-              toDot = lineDots[hopIndex + 1];
-              to = dotCenter(toDot);
-              dist = Math.hypot(to.x - from.x, to.y - from.y);
-            }
-            var remain = dist - covered;
-            if (step >= remain) {
-              step -= remain;
-              hopIndex += 1;
-              covered = 0;
-              continue;
-            }
-            covered += step;
-            break;
-          }
-          if (hopIndex >= lineDots.length - 1) {
-            hopIndex = Math.max(0, lineDots.length - 2);
-            covered = 0;
-          }
-          var startDot = lineDots[hopIndex];
-          var endDot = lineDots[hopIndex + 1];
-          var start = dotCenter(startDot);
-          var end = dotCenter(endDot);
-          var span = Math.hypot(end.x - start.x, end.y - start.y) || 1;
-          var part = Math.min(1, covered / span);
-          var tipX = start.x + (end.x - start.x) * part;
-          var tipY = start.y + (end.y - start.y) * part;
-          pushDotsOffSegment(start.x, start.y, tipX, tipY, startDot, endDot);
-          poly.setAttribute("points", start.x.toFixed(1) + "," + start.y.toFixed(1) + " " + tipX.toFixed(1) + "," + tipY.toFixed(1));
-        }
-
-        var reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-
-        if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-          dots.forEach(function (dot) {
-            dot.el.style.transform = "translate3d(" + dot.x.toFixed(2) + "px," + dot.y.toFixed(2) + "px,0)";
-          });
-          drawLine(0);
-        } else {
-          requestAnimationFrame(placeDots);
-        }
 
         var releaseAt = new Date(2027, 0, 1).getTime();
 
