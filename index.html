@@ -1,0 +1,1040 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="white" data-lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#ffffff" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="OC" />
+    <title>OC</title>
+    <link rel="manifest" href="manifest.webmanifest" />
+    <link rel="icon" type="image/png" href="assets/favicon_0" />
+    <link rel="apple-touch-icon" href="assets/apple-touch-icon.png" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <script>
+      (function () {
+        var theme = localStorage.getItem("oc-theme");
+        var lang = localStorage.getItem("oc-lang");
+        if (theme === "black" || theme === "white") {
+          document.documentElement.dataset.theme = theme;
+        }
+        if (lang === "de" || lang === "en") {
+          document.documentElement.dataset.lang = lang;
+          document.documentElement.lang = lang === "de" ? "de" : "en";
+        }
+        document.documentElement.style.setProperty("--app-height", window.innerHeight + "px");
+      })();
+    </script>
+    <style>
+      :root {
+        --widget: #fff;
+        --ink: #111;
+        --shadow: 0 10px 28px rgba(0, 0, 0, 0.18);
+        --sans: "Inter", sans-serif;
+        --app-height: 100dvh;
+      }
+
+      html[data-theme="black"] {
+        --widget: #111;
+        --ink: #fff;
+        --shadow: 0 10px 28px rgba(0, 0, 0, 0.35);
+      }
+
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      html {
+        height: 100%;
+        overflow: hidden;
+        background: #000;
+        touch-action: manipulation;
+        -webkit-text-size-adjust: 100%;
+      }
+
+      body {
+        height: 100%;
+        overflow: hidden;
+        color: var(--ink);
+        font-family: var(--sans);
+        -webkit-font-smoothing: antialiased;
+      }
+
+      .bg {
+        position: fixed;
+        inset: 0;
+        z-index: 0;
+        overflow: hidden;
+        background: #1d2a1c url("assets/background.jpg") center / cover no-repeat;
+        pointer-events: none;
+      }
+
+      .bg-points {
+        position: absolute;
+        inset: 0;
+        z-index: 0;
+        pointer-events: none;
+      }
+
+      .bg-points span {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 18.2px;
+        height: 18.2px;
+        background: rgba(255, 255, 255, 0.72);
+        border-radius: 50%;
+        will-change: transform;
+      }
+
+      .point-line {
+        position: absolute;
+        inset: 0;
+        z-index: 1;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+      }
+
+      .point-line polyline {
+        fill: none;
+        stroke: rgba(255, 255, 255, 0.72);
+        stroke-width: 3;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+      }
+
+      .slides {
+        position: relative;
+        z-index: 1;
+        height: var(--app-height);
+        overflow-x: hidden;
+        overflow-y: auto;
+        scroll-snap-type: y mandatory;
+        overscroll-behavior-y: contain;
+        -webkit-overflow-scrolling: touch;
+        touch-action: pan-y;
+      }
+
+      .slide {
+        position: relative;
+        z-index: 1;
+        height: var(--app-height);
+        min-height: var(--app-height);
+        scroll-snap-align: start;
+        scroll-snap-stop: always;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        padding:
+          5.5rem
+          calc(1.25rem + env(safe-area-inset-right, 0px))
+          calc(2.5rem + env(safe-area-inset-bottom, 0px))
+          calc(1.25rem + env(safe-area-inset-left, 0px));
+      }
+
+      .chrome {
+        position: absolute;
+        z-index: 1;
+        top: 0;
+        left: 0;
+        right: 0;
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 0.75rem;
+        padding:
+          calc(1.1rem + env(safe-area-inset-top, 0px))
+          calc(1rem + env(safe-area-inset-right, 0px))
+          0
+          calc(1rem + env(safe-area-inset-left, 0px));
+      }
+
+      .switch {
+        display: flex;
+        gap: 0.15rem;
+        padding: 0.22rem;
+        background: var(--widget);
+        color: var(--ink);
+        border-radius: 999px;
+        box-shadow: var(--shadow);
+      }
+
+      .switch button {
+        border: 0;
+        background: transparent;
+        color: inherit;
+        border-radius: 999px;
+        min-height: 2.75rem;
+        padding: 0.42rem 0.85rem;
+        font: inherit;
+        font-size: 0.82rem;
+        font-weight: 600;
+        letter-spacing: 0.01em;
+        cursor: pointer;
+        touch-action: manipulation;
+        -webkit-tap-highlight-color: transparent;
+        user-select: none;
+      }
+
+      .switch button[aria-pressed="true"] {
+        background: var(--ink);
+        color: var(--widget);
+      }
+
+      .theme-button {
+        display: grid;
+        place-items: center;
+        width: 2.75rem;
+        height: 2.75rem;
+        padding: 0;
+        border: 0;
+        border-radius: 50%;
+        background: var(--widget);
+        color: var(--ink);
+        box-shadow: var(--shadow);
+        cursor: pointer;
+        touch-action: manipulation;
+        -webkit-tap-highlight-color: transparent;
+        user-select: none;
+      }
+
+      .theme-button svg {
+        width: 1.15rem;
+        height: 1.15rem;
+        display: block;
+      }
+
+      html[data-theme="white"] .theme-button .sun,
+      html[data-theme="black"] .theme-button .moon {
+        display: none;
+      }
+
+      .theme-button:focus-visible,
+      .switch button:focus-visible {
+        outline: 2px solid var(--ink);
+        outline-offset: 2px;
+      }
+
+      .switch button:active,
+      .theme-button:active {
+        transform: scale(0.96);
+      }
+
+      .lockup {
+        position: relative;
+        z-index: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        max-width: 100%;
+      }
+
+      .logo-widget {
+        display: grid;
+        place-items: center;
+        width: min(46.2vw, 242px);
+        aspect-ratio: 1;
+        overflow: hidden;
+        background: var(--widget);
+        border-radius: 50%;
+        box-shadow: var(--shadow);
+      }
+
+      .logo-widget img {
+        display: block;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        -webkit-touch-callout: none;
+        user-select: none;
+      }
+
+      html[data-theme="black"] .logo-widget {
+        background: #000;
+      }
+
+      html[data-theme="black"] .logo-widget img {
+        filter: invert(1);
+      }
+
+      .slogan {
+        margin-top: 2.3rem;
+        width: fit-content;
+        max-width: 100%;
+        padding: 0.45rem 0.7rem;
+        background: var(--widget);
+        color: var(--ink);
+        border-radius: 0.75rem;
+        box-shadow: var(--shadow);
+        font-family: var(--sans);
+        font-size: clamp(1.9rem, 4.4vw, 2.3rem);
+        font-weight: 700;
+        letter-spacing: 0.01em;
+        line-height: 1.15;
+        text-align: center;
+        text-wrap: balance;
+      }
+
+      .slide-pair {
+        align-items: center;
+        justify-content: center;
+        height: var(--app-height);
+        padding:
+          calc(1.5rem + env(safe-area-inset-top, 0px))
+          calc(1.5rem + env(safe-area-inset-right, 0px))
+          calc(1.5rem + env(safe-area-inset-bottom, 0px))
+          calc(1.5rem + env(safe-area-inset-left, 0px));
+        container-type: size;
+      }
+
+      .pair {
+        position: relative;
+        z-index: 1;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1.25rem;
+        width: fit-content;
+        max-width: 100%;
+        justify-items: center;
+      }
+
+      .panel {
+        width: min(50cqh, calc((100cqw - 1.25rem) / 2));
+        aspect-ratio: 1;
+        background: var(--widget);
+        border: 2px solid var(--ink);
+        border-radius: 1.5rem;
+      }
+
+      @container (max-width: calc(100dvh - 1.75rem)) {
+        .pair {
+          grid-template-columns: 1fr;
+        }
+
+        .panel {
+          width: min(100cqw, calc((100cqh - 1.25rem) / 2));
+        }
+      }
+
+      .slide-end {
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: var(--app-height);
+        padding:
+          calc(1.5rem + env(safe-area-inset-top, 0px))
+          calc(1.5rem + env(safe-area-inset-right, 0px))
+          calc(1.5rem + env(safe-area-inset-bottom, 0px))
+          calc(1.5rem + env(safe-area-inset-left, 0px));
+        container-type: size;
+      }
+
+      .end-stage {
+        position: relative;
+        z-index: 1;
+        display: flex;
+        max-width: 100%;
+      }
+
+      .end-board {
+        position: absolute;
+        top: calc(100% + 1.25rem);
+        left: 50%;
+        transform: translateX(-50%);
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        align-items: flex-start;
+        gap: 1.25rem;
+        width: max-content;
+        max-width: calc(100vw - 3rem);
+      }
+
+      .end-widget {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 0;
+        background: var(--widget);
+        color: var(--ink);
+        border-radius: 1.5rem;
+      }
+
+      .timer-widget {
+        width: fit-content;
+        max-width: 100%;
+        height: fit-content;
+        border-radius: 3rem;
+        padding: 0.108em 0.168em;
+        font-size: min(10.4rem, max(4.4rem, 10.8vw), calc((100vw - 3rem) / 6.2));
+      }
+
+      .timer-grid {
+        display: grid;
+        grid-template-columns: repeat(4, max-content);
+        column-gap: 0.276em;
+        width: auto;
+        text-align: center;
+      }
+
+      .timer-value {
+        display: block;
+        font-weight: 700;
+        font-variant-numeric: tabular-nums;
+        font-size: 1em;
+        line-height: 1;
+      }
+
+      .timer-label {
+        display: block;
+        margin-top: 0.048em;
+        font-size: 0.24em;
+        font-weight: 600;
+        letter-spacing: 0.03em;
+        line-height: 1.15;
+      }
+
+      .release-widget {
+        flex-direction: column;
+        gap: 0.55rem;
+        width: fit-content;
+        max-width: 100%;
+        height: fit-content;
+        padding: 0.45rem 0.7rem;
+        text-align: center;
+      }
+
+      .end-kicker {
+        font-size: clamp(0.9rem, 1.5vw, 1.15rem);
+        font-weight: 600;
+      }
+
+      .end-date {
+        font-size: clamp(1.7rem, 3vw, 2.7rem);
+        font-weight: 700;
+        font-variant-numeric: tabular-nums;
+        line-height: 1;
+      }
+
+      .x-widget {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.45rem;
+        box-sizing: border-box;
+        width: var(--card-w, max-content);
+        height: var(--card-h, max-content);
+        max-width: 100%;
+        padding: 0.35rem 0.55rem;
+        overflow: hidden;
+        color: inherit;
+        text-decoration: none;
+        touch-action: manipulation;
+        -webkit-tap-highlight-color: transparent;
+      }
+
+      .x-widget:active {
+        transform: scale(0.98);
+      }
+
+      .x-mark {
+        width: 1.35rem;
+        height: 1.35rem;
+        flex: none;
+      }
+
+      .x-name {
+        font-size: 1.15rem;
+        font-weight: 700;
+        line-height: 1;
+      }
+
+      @media (max-width: 640px) {
+        .chrome {
+          flex-wrap: wrap;
+        }
+
+        .switch button {
+          font-size: 0.75rem;
+        }
+
+        .slogan {
+          padding: 0.4rem 0.6rem;
+          font-size: clamp(1.05rem, 4.8vw, 1.35rem);
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        .slides {
+          scroll-behavior: auto;
+        }
+
+      }
+    </style>
+  </head>
+  <body>
+    <div class="bg" aria-hidden="true"></div>
+    <main class="slides">
+      <section class="slide" data-slide="start">
+        <div class="chrome">
+          <button type="button" class="theme-button" id="theme-button" aria-label="Black">
+            <svg class="sun" viewBox="0 0 24 24" aria-hidden="true">
+              <circle cx="12" cy="12" r="4.2" fill="none" stroke="currentColor" stroke-width="2" />
+              <g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                <path d="M12 2.5v2.2M12 19.3v2.2M2.5 12h2.2M19.3 12h2.2" />
+                <path d="M5.2 5.2l1.6 1.6M17.2 17.2l1.6 1.6M18.8 5.2l-1.6 1.6M6.8 17.2l-1.6 1.6" />
+              </g>
+            </svg>
+            <svg class="moon" viewBox="0 0 24 24" aria-hidden="true">
+              <path fill="currentColor" d="M15.2 2.8a8.6 8.6 0 1 0 6 12.6 7 7 0 0 1-6-12.6z" />
+            </svg>
+          </button>
+          <div class="switch" role="group" id="lang-switch" aria-label="Language">
+            <button type="button" data-lang-set="en" aria-pressed="true" aria-label="English">EN</button>
+            <button type="button" data-lang-set="de" aria-pressed="false" aria-label="Deutsch">DE</button>
+          </div>
+        </div>
+        <div class="lockup">
+          <div class="logo-widget">
+            <img src="assets/logo.png" alt="OC" width="160" height="160" />
+          </div>
+          <p class="slogan" id="slogan">The foundation for human-centric solutions</p>
+        </div>
+      </section>
+      <section class="slide slide-pair" data-slide="middle-1">
+        <div class="pair">
+          <div class="panel"></div>
+          <div class="panel"></div>
+        </div>
+      </section>
+      <section class="slide slide-pair" data-slide="middle-2">
+        <div class="pair">
+          <div class="panel"></div>
+          <div class="panel"></div>
+        </div>
+      </section>
+      <section class="slide slide-end" data-slide="end">
+        <div class="end-stage">
+        <div class="end-widget timer-widget" role="timer" aria-label="1 January 2027">
+          <div class="timer-grid">
+            <div>
+              <span class="timer-value" id="timer-days">0</span>
+              <span class="timer-label" data-copy="days">Days</span>
+            </div>
+            <div>
+              <span class="timer-value" id="timer-hours">00</span>
+              <span class="timer-label" data-copy="hours">Hours</span>
+            </div>
+            <div>
+              <span class="timer-value" id="timer-minutes">00</span>
+              <span class="timer-label" data-copy="minutes">Minutes</span>
+            </div>
+            <div>
+              <span class="timer-value" id="timer-seconds">00</span>
+              <span class="timer-label" data-copy="seconds">Seconds</span>
+            </div>
+          </div>
+        </div>
+        <div class="end-board">
+          <div class="end-widget release-widget">
+            <p class="end-kicker" data-copy="release">Release date</p>
+            <p class="end-date">01.01.2027</p>
+          </div>
+          <a class="end-widget x-widget" href="https://x.com/JulianGeiss" target="_blank" rel="noopener noreferrer">
+            <svg class="x-mark" viewBox="0 0 24 24" aria-hidden="true">
+              <path fill="currentColor" d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.744l7.727-8.835L1.254 2.25H8.08l4.253 5.622L18.244 2.25zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+            </svg>
+            <span class="x-name">julian.mg</span>
+          </a>
+        </div>
+        </div>
+      </section>
+    </main>
+    <script>
+      (function () {
+        var copy = {
+          en: {
+            slogan: "The foundation for human-centric solutions",
+            white: "White",
+            black: "Black",
+            mode: "Color mode",
+            days: "Days",
+            hours: "Hours",
+            minutes: "Minutes",
+            seconds: "Seconds",
+            release: "Release date"
+          },
+          de: {
+            slogan: "Das Fundament für menschenzentrierte Lösungen",
+            white: "Weiß",
+            black: "Schwarz",
+            mode: "Farbmodus",
+            days: "Tage",
+            hours: "Stunden",
+            minutes: "Minuten",
+            seconds: "Sekunden",
+            release: "Release-Datum"
+          }
+        };
+
+        var root = document.documentElement;
+        var themeButton = document.getElementById("theme-button");
+        var langSwitch = document.getElementById("lang-switch");
+        var slogan = document.getElementById("slogan");
+        var themeMeta = document.querySelector('meta[name="theme-color"]');
+
+        function theme() {
+          return root.dataset.theme === "black" ? "black" : "white";
+        }
+
+        function lang() {
+          return root.dataset.lang === "de" ? "de" : "en";
+        }
+
+        function render() {
+          var currentTheme = theme();
+          var currentLang = lang();
+          var text = copy[currentLang];
+
+          root.lang = currentLang === "de" ? "de" : "en";
+          slogan.textContent = text.slogan;
+          themeButton.setAttribute("aria-label", currentTheme === "black" ? text.white : text.black);
+          langSwitch.querySelectorAll("button").forEach(function (button) {
+            button.setAttribute("aria-pressed", String(button.dataset.langSet === currentLang));
+          });
+          document.querySelectorAll("[data-copy]").forEach(function (node) {
+            node.textContent = text[node.dataset.copy];
+          });
+
+          if (themeMeta) {
+            themeMeta.setAttribute("content", currentTheme === "black" ? "#111111" : "#ffffff");
+          }
+
+          fitSlogan();
+          matchXWidget();
+        }
+
+        function matchXWidget() {
+          var release = document.querySelector(".release-widget");
+          var board = document.querySelector(".end-board");
+          if (!release || !board) return;
+          board.style.setProperty("--card-w", release.offsetWidth + "px");
+          board.style.setProperty("--card-h", release.offsetHeight + "px");
+        }
+
+        function fitSlogan() {
+          slogan.style.width = "";
+          var style = getComputedStyle(slogan);
+          var pad = parseFloat(style.paddingLeft) + parseFloat(style.paddingRight);
+          var range = document.createRange();
+          range.selectNodeContents(slogan);
+          var before = lineMetrics(range);
+          if (!before.widest) return;
+          var slide = slogan.closest(".slide");
+          var slideStyle = getComputedStyle(slide);
+          var available =
+            slide.clientWidth -
+            parseFloat(slideStyle.paddingLeft) -
+            parseFloat(slideStyle.paddingRight);
+          var next = Math.min(Math.ceil(before.widest + pad + 1), available);
+          slogan.style.width = next + "px";
+          var after = lineMetrics(range);
+          if (after.count > before.count || after.widest > next - pad + 1) {
+            slogan.style.width = available + "px";
+          }
+        }
+
+        function lineMetrics(range) {
+          var rects = range.getClientRects();
+          var widest = 0;
+          for (var i = 0; i < rects.length; i++) {
+            if (rects[i].width > widest) widest = rects[i].width;
+          }
+          return { widest: widest, count: rects.length };
+        }
+
+        window.addEventListener("resize", syncViewport);
+        document.fonts.ready.then(function () {
+          fitSlogan();
+          matchXWidget();
+        });
+        new ResizeObserver(matchXWidget).observe(document.querySelector(".release-widget"));
+
+        var viewportWidth = window.innerWidth;
+        var viewportHeight = window.innerHeight;
+
+        function syncViewport() {
+          var width = window.innerWidth;
+          var height = window.innerHeight;
+          var widthChanged = width !== viewportWidth;
+          if (widthChanged || Math.abs(height - viewportHeight) > 140) {
+            viewportWidth = width;
+            viewportHeight = height;
+            root.style.setProperty("--app-height", height + "px");
+          }
+          if (widthChanged) {
+            fitSlogan();
+            matchXWidget();
+          }
+        }
+
+        themeButton.addEventListener("click", function () {
+          root.dataset.theme = theme() === "black" ? "white" : "black";
+          localStorage.setItem("oc-theme", theme());
+          render();
+        });
+
+        langSwitch.addEventListener("click", function (event) {
+          var button = event.target.closest("button");
+          if (!button) return;
+          root.dataset.lang = button.dataset.langSet;
+          localStorage.setItem("oc-lang", lang());
+          render();
+        });
+
+        render();
+
+        var pointSize = 18.2;
+        var dots = [];
+        var bg = document.querySelector(".bg");
+        var layer = document.createElement("div");
+        layer.className = "bg-points";
+        bg.appendChild(layer);
+        var maxX = Math.max(0, window.innerWidth - pointSize);
+        var maxY = Math.max(0, window.innerHeight - pointSize);
+        for (var j = 0; j < 100; j++) {
+          var point = document.createElement("span");
+          var speed = (18 + Math.random() * 28) * 0.2;
+          var angle = Math.random() * Math.PI * 2;
+          dots.push({
+            el: point,
+            x: Math.random() * maxX,
+            y: Math.random() * maxY,
+            vx: Math.cos(angle) * speed,
+            vy: Math.sin(angle) * speed
+          });
+          layer.appendChild(point);
+        }
+
+        function separateDots() {
+          var minDist = pointSize;
+          for (var a = 0; a < dots.length; a++) {
+            for (var b = a + 1; b < dots.length; b++) {
+              var dx = dots[b].x - dots[a].x;
+              var dy = dots[b].y - dots[a].y;
+              var dist = Math.hypot(dx, dy);
+              if (dist >= minDist) continue;
+              if (dist < 0.01) {
+                var nudge = Math.random() * Math.PI * 2;
+                dx = Math.cos(nudge);
+                dy = Math.sin(nudge);
+                dist = 0.01;
+              }
+              var overlap = minDist - dist;
+              var nx = dx / dist;
+              var ny = dy / dist;
+              dots[a].x -= nx * overlap * 0.5;
+              dots[a].y -= ny * overlap * 0.5;
+              dots[b].x += nx * overlap * 0.5;
+              dots[b].y += ny * overlap * 0.5;
+              var closing = (dots[a].vx - dots[b].vx) * nx + (dots[a].vy - dots[b].vy) * ny;
+              if (closing > 0) {
+                dots[a].vx -= closing * nx;
+                dots[a].vy -= closing * ny;
+                dots[b].vx += closing * nx;
+                dots[b].vy += closing * ny;
+              }
+            }
+          }
+        }
+
+        function clampDot(dot, limitX, limitY) {
+          if (dot.x < 0) {
+            dot.x = 0;
+            dot.vx = Math.abs(dot.vx);
+          } else if (dot.x > limitX) {
+            dot.x = limitX;
+            dot.vx = -Math.abs(dot.vx);
+          }
+          if (dot.y < 0) {
+            dot.y = 0;
+            dot.vy = Math.abs(dot.vy);
+          } else if (dot.y > limitY) {
+            dot.y = limitY;
+            dot.vy = -Math.abs(dot.vy);
+          }
+        }
+
+        function settleDots() {
+          var limitX = Math.max(0, window.innerWidth - pointSize);
+          var limitY = Math.max(0, window.innerHeight - pointSize);
+          separateDots();
+          for (var n = 0; n < dots.length; n++) clampDot(dots[n], limitX, limitY);
+        }
+
+        for (var pass = 0; pass < 40; pass++) settleDots();
+
+        var lastFrame = 0;
+        function placeDots(now) {
+          var dt = lastFrame ? Math.min(0.05, (now - lastFrame) / 1000) : 0;
+          lastFrame = now;
+          var limitX = Math.max(0, window.innerWidth - pointSize);
+          var limitY = Math.max(0, window.innerHeight - pointSize);
+          for (var n = 0; n < dots.length; n++) {
+            var dot = dots[n];
+            dot.x += dot.vx * dt;
+            dot.y += dot.vy * dt;
+          }
+          settleDots();
+          settleDots();
+          drawLine(now);
+          settleDots();
+          for (var i = 0; i < dots.length; i++) {
+            dots[i].el.style.transform = "translate3d(" + dots[i].x.toFixed(2) + "px," + dots[i].y.toFixed(2) + "px,0)";
+          }
+          requestAnimationFrame(placeDots);
+        }
+
+        var line = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+        line.setAttribute("class", "point-line");
+        line.setAttribute("aria-hidden", "true");
+        var poly = document.createElementNS("http://www.w3.org/2000/svg", "polyline");
+        line.appendChild(poly);
+        bg.appendChild(line);
+
+        function dotCenter(dot) {
+          return {
+            x: dot.x + pointSize / 2,
+            y: dot.y + pointSize / 2
+          };
+        }
+
+        function closestOnSegment(px, py, ax, ay, bx, by) {
+          var abx = bx - ax;
+          var aby = by - ay;
+          var len2 = abx * abx + aby * aby;
+          var t = len2 < 1e-8 ? 0 : ((px - ax) * abx + (py - ay) * aby) / len2;
+          if (t < 0) t = 0;
+          else if (t > 1) t = 1;
+          var cx = ax + abx * t;
+          var cy = ay + aby * t;
+          return {
+            dist: Math.hypot(px - cx, py - cy),
+            t: t,
+            cx: cx,
+            cy: cy,
+            len: Math.sqrt(len2)
+          };
+        }
+
+        var lineClearance = pointSize / 2 + 1.5;
+
+        function segmentBlocked(ax, ay, bx, by, ignoreA, ignoreB) {
+          var span = Math.hypot(bx - ax, by - ay);
+          if (span < 0.5) return true;
+          for (var n = 0; n < dots.length; n++) {
+            var dot = dots[n];
+            if (dot === ignoreA || dot === ignoreB) continue;
+            var center = dotCenter(dot);
+            var hit = closestOnSegment(center.x, center.y, ax, ay, bx, by);
+            if (hit.dist >= lineClearance) continue;
+            if (hit.t * hit.len < pointSize || (1 - hit.t) * hit.len < pointSize) continue;
+            return true;
+          }
+          return false;
+        }
+
+        function pushDotsOffSegment(ax, ay, bx, by, ignoreA, ignoreB) {
+          var span = Math.hypot(bx - ax, by - ay);
+          if (span < 0.5) return;
+          for (var n = 0; n < dots.length; n++) {
+            var dot = dots[n];
+            if (dot === ignoreA || dot === ignoreB) continue;
+            var center = dotCenter(dot);
+            var hit = closestOnSegment(center.x, center.y, ax, ay, bx, by);
+            if (hit.dist >= lineClearance) continue;
+            if (hit.t * hit.len < pointSize || (1 - hit.t) * hit.len < pointSize) continue;
+            var nx;
+            var ny;
+            if (hit.dist < 0.01) {
+              nx = -(by - ay) / span;
+              ny = (bx - ax) / span;
+            } else {
+              nx = (center.x - hit.cx) / hit.dist;
+              ny = (center.y - hit.cy) / hit.dist;
+            }
+            var push = lineClearance - hit.dist;
+            dot.x += nx * push;
+            dot.y += ny * push;
+            var closing = dot.vx * nx + dot.vy * ny;
+            if (closing < 0) {
+              dot.vx -= closing * nx;
+              dot.vy -= closing * ny;
+            }
+          }
+        }
+
+        function pickLine() {
+          var picks = 20 + Math.floor(Math.random() * 21);
+          var path = [];
+          var used = [];
+          var start = dots[Math.floor(Math.random() * dots.length)];
+          path.push(start);
+          used.push(start);
+          while (path.length < picks) {
+            var from = path[path.length - 1];
+            var fromCenter = dotCenter(from);
+            var best = null;
+            var bestScore = -1;
+            for (var n = 0; n < dots.length; n++) {
+              var candidate = dots[n];
+              if (used.indexOf(candidate) !== -1) continue;
+              var toCenter = dotCenter(candidate);
+              var dist = Math.hypot(toCenter.x - fromCenter.x, toCenter.y - fromCenter.y);
+              if (dist < pointSize * 2.5) continue;
+              if (segmentBlocked(fromCenter.x, fromCenter.y, toCenter.x, toCenter.y, from, candidate)) continue;
+              var score = dist + Math.random() * 80;
+              if (score > bestScore) {
+                bestScore = score;
+                best = candidate;
+              }
+            }
+            if (!best) break;
+            path.push(best);
+            used.push(best);
+          }
+          if (path.length < 2) {
+            var fallback = dots.slice().sort(function (a, b) { return a.y - b.y; });
+            return [fallback[0], fallback[fallback.length - 1]];
+          }
+          return path;
+        }
+
+        var lineDots = pickLine();
+        var hopIndex = 0;
+        var covered = 0;
+        var lastDraw = 0;
+
+        function lineTempo() {
+          return Math.min(window.innerWidth, window.innerHeight) * 0.15;
+        }
+
+        function drawLine(now) {
+          var width = window.innerWidth;
+          var height = window.innerHeight;
+          line.setAttribute("viewBox", "0 0 " + width + " " + height);
+          if (lineDots.length < 2) return;
+          if (reduceMotion) {
+            var last = lineDots.length - 1;
+            var a = dotCenter(lineDots[last - 1]);
+            var b = dotCenter(lineDots[last]);
+            poly.setAttribute("points", a.x.toFixed(1) + "," + a.y.toFixed(1) + " " + b.x.toFixed(1) + "," + b.y.toFixed(1));
+            return;
+          }
+          var dt = lastDraw ? Math.min(0.05, (now - lastDraw) / 1000) : 0;
+          lastDraw = now;
+          var step = lineTempo() * dt;
+          var guard = 0;
+          while (guard < 120) {
+            guard++;
+            if (hopIndex >= lineDots.length - 1) {
+              lineDots = pickLine();
+              hopIndex = 0;
+              covered = 0;
+              if (lineDots.length < 2) return;
+            }
+            var fromDot = lineDots[hopIndex];
+            var toDot = lineDots[hopIndex + 1];
+            var from = dotCenter(fromDot);
+            var to = dotCenter(toDot);
+            var dist = Math.hypot(to.x - from.x, to.y - from.y);
+            if (dist < pointSize * 2.5 || segmentBlocked(from.x, from.y, to.x, to.y, fromDot, toDot)) {
+              var swapped = false;
+              for (var look = hopIndex + 2; look < lineDots.length; look++) {
+                var alt = lineDots[look];
+                var altCenter = dotCenter(alt);
+                var altDist = Math.hypot(altCenter.x - from.x, altCenter.y - from.y);
+                if (altDist < pointSize * 2.5) continue;
+                if (segmentBlocked(from.x, from.y, altCenter.x, altCenter.y, fromDot, alt)) continue;
+                lineDots[hopIndex + 1] = alt;
+                swapped = true;
+                break;
+              }
+              if (!swapped) {
+                hopIndex += 1;
+                covered = 0;
+                continue;
+              }
+              toDot = lineDots[hopIndex + 1];
+              to = dotCenter(toDot);
+              dist = Math.hypot(to.x - from.x, to.y - from.y);
+            }
+            var remain = dist - covered;
+            if (step >= remain) {
+              step -= remain;
+              hopIndex += 1;
+              covered = 0;
+              continue;
+            }
+            covered += step;
+            break;
+          }
+          if (hopIndex >= lineDots.length - 1) {
+            hopIndex = Math.max(0, lineDots.length - 2);
+            covered = 0;
+          }
+          var startDot = lineDots[hopIndex];
+          var endDot = lineDots[hopIndex + 1];
+          var start = dotCenter(startDot);
+          var end = dotCenter(endDot);
+          var span = Math.hypot(end.x - start.x, end.y - start.y) || 1;
+          var part = Math.min(1, covered / span);
+          var tipX = start.x + (end.x - start.x) * part;
+          var tipY = start.y + (end.y - start.y) * part;
+          pushDotsOffSegment(start.x, start.y, tipX, tipY, startDot, endDot);
+          poly.setAttribute("points", start.x.toFixed(1) + "," + start.y.toFixed(1) + " " + tipX.toFixed(1) + "," + tipY.toFixed(1));
+        }
+
+        var reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+        if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+          dots.forEach(function (dot) {
+            dot.el.style.transform = "translate3d(" + dot.x.toFixed(2) + "px," + dot.y.toFixed(2) + "px,0)";
+          });
+          drawLine(0);
+        } else {
+          requestAnimationFrame(placeDots);
+        }
+
+        var releaseAt = new Date(2027, 0, 1).getTime();
+
+        function pad(value) {
+          return value < 10 ? "0" + value : String(value);
+        }
+
+        function tick() {
+          var remaining = Math.max(0, releaseAt - Date.now());
+          var totalSeconds = Math.floor(remaining / 1000);
+          document.getElementById("timer-days").textContent = String(Math.floor(totalSeconds / 86400));
+          document.getElementById("timer-hours").textContent = pad(Math.floor(totalSeconds / 3600) % 24);
+          document.getElementById("timer-minutes").textContent = pad(Math.floor(totalSeconds / 60) % 60);
+          document.getElementById("timer-seconds").textContent = pad(totalSeconds % 60);
+        }
+
+        tick();
+        setInterval(tick, 1000);
+      })();
+    </script>
+  </body>
+</html>
