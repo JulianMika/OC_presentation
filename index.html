@@ -131,30 +131,15 @@
           calc(1.25rem + env(safe-area-inset-left, 0px));
       }
 
-      .chrome {
+      .lang-wrap {
         position: fixed;
-        z-index: 2;
-        top: 0;
-        left: 0;
-        right: 0;
+        z-index: 3;
+        top: calc(1.1rem + env(safe-area-inset-top, 0px));
+        right: calc(0.9rem + env(safe-area-inset-right, 0px));
         display: flex;
         align-items: center;
-        justify-content: flex-end;
-        gap: 0.75rem;
-        height: calc(1.1rem + env(safe-area-inset-top, 0px) + 2.75rem);
-        padding:
-          calc(1.1rem + env(safe-area-inset-top, 0px))
-          calc(0.9rem + env(safe-area-inset-right, 0px))
-          0
-          calc(0.9rem + env(safe-area-inset-left, 0px));
-        pointer-events: none;
-      }
-
-      .lang-wrap {
-        position: relative;
-        z-index: 3;
+        height: 2.75rem;
         pointer-events: auto;
-        display: flex;
       }
 
       .lang-button,
@@ -186,9 +171,22 @@
       }
 
       .lang-button {
+        display: inline-grid;
+        align-items: center;
+        justify-items: start;
         height: 2.55rem;
         padding-top: 0;
         padding-bottom: 0;
+        white-space: nowrap;
+      }
+
+      .lang-face,
+      .lang-sizer {
+        grid-area: 1 / 1;
+      }
+
+      .lang-sizer {
+        visibility: hidden;
       }
 
       .lang-wrap.is-open .lang-button,
@@ -219,8 +217,11 @@
 
       html.lang-open .slides {
         visibility: hidden;
-        opacity: 0;
         pointer-events: none;
+      }
+
+      html.lang-open .lang-wrap {
+        visibility: visible;
       }
 
       .lang-menu[hidden] {
@@ -228,13 +229,10 @@
       }
 
       @media (min-width: 768px) {
-        .chrome {
-          height: calc(1.5rem + env(safe-area-inset-top, 0px) + 3rem);
-          padding:
-            calc(1.5rem + env(safe-area-inset-top, 0px))
-            calc(1.85rem + env(safe-area-inset-right, 0px))
-            0
-            calc(1.85rem + env(safe-area-inset-left, 0px));
+        .lang-wrap {
+          top: calc(1.5rem + env(safe-area-inset-top, 0px));
+          right: calc(1.85rem + env(safe-area-inset-right, 0px));
+          height: 3rem;
         }
 
         .lang-button,
@@ -268,69 +266,32 @@
         width: min(46.2vw, 242px);
         aspect-ratio: 1;
         overflow: hidden;
-        background: #1d2a1c url("assets/background.jpg") center / cover no-repeat fixed;
+        background: transparent;
         border-radius: 50%;
       }
 
-      .logo-row {
-        --name-size: clamp(1.05rem, 2.6vw, 2rem);
-        position: relative;
-        display: flex;
-        align-items: center;
-        gap: 1.15rem;
-        width: max-content;
-        max-width: 100%;
+      .logo-widget > * {
+        grid-area: 1 / 1;
       }
 
-      .logo-row::before {
-        content: "";
-        position: absolute;
-        z-index: 0;
-        left: -0.7rem;
-        right: -0.7rem;
-        top: 50%;
-        height: calc(1.15 * var(--name-size) + 0.9rem);
-        transform: translateY(-50%);
-        background: var(--glass);
-        border-radius: 0.75rem;
-        backdrop-filter: blur(12px);
-        -webkit-backdrop-filter: blur(12px);
+      .logo-flow {
+        position: relative;
+        z-index: 2;
+        display: block;
+        width: 100%;
+        height: 100%;
         pointer-events: none;
       }
 
       .logo-widget img {
+        position: relative;
+        z-index: 1;
         display: block;
         width: 100%;
         height: 100%;
         object-fit: cover;
         -webkit-touch-callout: none;
         user-select: none;
-      }
-
-      .logo-name {
-        position: relative;
-        z-index: 1;
-        margin: 0;
-        width: max-content;
-        max-width: 100%;
-        color: #111;
-        font-family: "Saira Stencil One", "Bauhaus 93", sans-serif;
-        font-size: var(--name-size);
-        font-weight: 400;
-        font-synthesis: none;
-        letter-spacing: 0.01em;
-        line-height: 1.15;
-        white-space: nowrap;
-      }
-
-      .logo-name-left {
-        justify-self: end;
-        text-align: right;
-      }
-
-      .logo-name-right {
-        justify-self: start;
-        text-align: left;
       }
 
       html[data-theme="black"] .logo-widget img {
@@ -386,9 +347,15 @@
       }
 
       .panel {
-        width: min(50cqh, calc((100cqw - 1.25rem) / 2));
+        width: min(
+          100cqh,
+          calc((100cqw - 1.25rem) / 2),
+          max(50cqh, 20rem, calc((56cqw - 1.25rem) / 2))
+        );
         aspect-ratio: 1;
-        background: var(--widget);
+        background: var(--glass);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
         border: 2px solid var(--ink);
         border-radius: 1.5rem;
       }
@@ -540,24 +507,6 @@
       }
 
       @media (max-width: 640px) {
-        .chrome {
-          flex-wrap: wrap;
-        }
-
-        .logo-widget {
-          width: min(32vw, 242px);
-        }
-
-        .logo-row {
-          --name-size: clamp(0.78rem, 3.5vw, 1.15rem);
-        }
-
-        .logo-row::before {
-          left: -0.6rem;
-          right: -0.6rem;
-          height: calc(1.15 * var(--name-size) + 0.8rem);
-        }
-
         .slogan {
           padding: 0.4rem 0.6rem;
           font-size: clamp(1.05rem, 4.8vw, 1.35rem);
@@ -574,27 +523,27 @@
   </head>
   <body>
     <div class="bg" aria-hidden="true"></div>
-    <div class="chrome">
-      <div class="lang-wrap" id="lang-switch">
-            <button type="button" class="lang-button" id="lang-button" aria-expanded="false" aria-controls="lang-menu" data-copy="language">Language</button>        <ul class="lang-menu" id="lang-menu" hidden>
-          <li>
-            <button type="button" class="lang-option" data-lang-set="en">English</button>
-          </li>
-          <li>
-            <button type="button" class="lang-option" data-lang-set="de">Deutsch</button>
-          </li>
-        </ul>
-      </div>
-    </div>
     <main class="slides">
       <section class="slide" data-slide="start">
+        <div class="lang-wrap" id="lang-switch">
+          <button type="button" class="lang-button" id="lang-button" aria-expanded="false" aria-controls="lang-menu">
+            <span class="lang-face" data-copy="language">Language</span>
+            <span class="lang-sizer" aria-hidden="true">Language</span>
+            <span class="lang-sizer" aria-hidden="true">Sprache</span>
+          </button>
+          <ul class="lang-menu" id="lang-menu" hidden>
+            <li>
+              <button type="button" class="lang-option" data-lang-set="en">English</button>
+            </li>
+            <li>
+              <button type="button" class="lang-option" data-lang-set="de">Deutsch</button>
+            </li>
+          </ul>
+        </div>
         <div class="lockup">
-          <div class="logo-row">
-            <p class="logo-name logo-name-left" data-copy="nameLeft">Optimized</p>
-            <div class="logo-widget">
-              <img src="assets/logo.svg" alt="OC" width="160" height="160" />
-            </div>
-            <p class="logo-name logo-name-right" data-copy="nameRight">Consumption</p>
+          <div class="logo-widget">
+            <canvas class="logo-flow" aria-hidden="true"></canvas>
+            <img src="assets/logo.svg" alt="OC" width="160" height="160" />
           </div>
           <p class="slogan" id="slogan">The <span class="slogan-mark">Basis</span> for human-centric solutions</p>
         </div>
@@ -653,8 +602,6 @@
         var copy = {
           en: {
             slogan: "The Basis for human-centric solutions",
-            nameLeft: "Optimized",
-            nameRight: "Consumption",
             language: "Language",
             days: "Days",
             hours: "Hours",
@@ -664,8 +611,6 @@
           },
           de: {
             slogan: "Die Basis für menschenzentrierte Lösungen",
-            nameLeft: "Optimized",
-            nameRight: "Consumption",
             language: "Sprache",
             days: "Tage",
             hours: "Stunden",
@@ -846,6 +791,13 @@
           if (!langSwitch.contains(event.target)) setLangOpen(false);
         });
 
+        var slides = document.querySelector(".slides");
+        function placeLang() {
+          langSwitch.style.transform = "translateY(" + -slides.scrollTop + "px)";
+        }
+        slides.addEventListener("scroll", placeLang, { passive: true });
+        placeLang();
+
         document.addEventListener("keydown", function (event) {
           if (event.key === "Escape") setLangOpen(false);
         });
@@ -869,6 +821,365 @@
 
         tick();
         setInterval(tick, 1000);
+
+        var flowCanvas = document.querySelector(".logo-flow");
+        if (flowCanvas) startLogoFlow(flowCanvas);
+
+        function startLogoFlow(canvas) {
+          var ctx = canvas.getContext("2d");
+          if (!ctx) return;
+
+          var BOX = 1024;
+          var CENTER = 512;
+          var R_MIN = 230;
+          var R_MAX = 463;
+          var START = 0;
+          var END = -Math.PI * 2;
+          var FADE = (16 * Math.PI) / 180;
+          var INPUT = (24 * Math.PI) / 180;
+          var LINK = 170;
+          var SPACE = 62;
+          var DOT = 10.5;
+          var SPARK = 5.5;
+          var SPAWN_EVERY = 0.72;
+          var SPARK_EVERY = 0.85;
+          var SPARK_SPEED = 210;
+          var SPARK_PAUSE = 0.22;
+          var SPARK_MAX = 12;
+          var WEDGE = new Path2D(
+            "M 873.961 150.039 A 511.89 511.89 0 0 1 873.961 873.961 L 640.743 640.743 A 182.07 182.07 0 0 0 640.743 383.257 Z"
+          );
+          var OPEN = new Path2D();
+          OPEN.rect(0, 0, BOX, BOX);
+          OPEN.addPath(WEDGE);
+
+          var points = [];
+          var links = [];
+          var sparks = [];
+          var scale = 1;
+          var dpr = 1;
+          var clock = 0;
+          var nextSpawn = 0;
+          var nextSpark = 0;
+          var last = 0;
+          var frame = 0;
+          var onScreen = true;
+          var still = window.matchMedia("(prefers-reduced-motion: reduce)");
+
+          function makePoint(angle) {
+            var lane = R_MIN + 20 + Math.random() * (R_MAX - R_MIN - 40);
+            return {
+              a: angle,
+              r: lane,
+              lane: lane,
+              sway: 18 + Math.random() * 34,
+              phase: Math.random() * Math.PI * 2,
+              rate: 0.25 + Math.random() * 0.35,
+              speed: 72 + Math.random() * 20,
+              near: [],
+              gone: false,
+              alpha: 0,
+              x: 0,
+              y: 0
+            };
+          }
+
+          function dotSize() {
+            return Math.max(DOT, 1.7 / scale);
+          }
+
+          function place(p) {
+            p.x = CENTER + p.r * Math.cos(p.a);
+            p.y = CENTER + p.r * Math.sin(p.a);
+            p.alpha = Math.max(0, Math.min(1, (START - p.a) / FADE, (p.a - END) / FADE));
+          }
+
+          function apart(p, q) {
+            return Math.abs(p.a - q.a) > Math.PI;
+          }
+
+          function ahead(p, q) {
+            var gap = p.a - q.a;
+            return gap > 0 && gap < Math.PI;
+          }
+
+          function step(dt) {
+            clock += dt;
+            nextSpawn -= dt;
+            if (nextSpawn <= 0) {
+              points.push(makePoint(START));
+              nextSpawn = SPAWN_EVERY * (0.75 + Math.random() * 0.5);
+            }
+
+            points.forEach(place);
+
+            points.forEach(function (p) {
+              var fx = 0;
+              var fy = 0;
+              points.forEach(function (q) {
+                if (q === p || apart(p, q)) return;
+                var dx = p.x - q.x;
+                var dy = p.y - q.y;
+                var d = Math.sqrt(dx * dx + dy * dy);
+                if (d > 0 && d < SPACE) {
+                  var push = (SPACE - d) / SPACE;
+                  fx += (dx / d) * push;
+                  fy += (dy / d) * push;
+                }
+              });
+
+              var cos = Math.cos(p.a);
+              var sin = Math.sin(p.a);
+              var radial = fx * cos + fy * sin;
+              var along = fx * sin - fy * cos;
+              var target = Math.min(R_MAX, Math.max(R_MIN, p.lane + Math.sin(clock * p.rate + p.phase) * p.sway));
+
+              p.r += ((target - p.r) * 0.9 + radial * 120) * dt;
+              p.r = Math.min(R_MAX, Math.max(R_MIN, p.r));
+              p.a -= (Math.max(p.speed * 0.35, p.speed + along * 60) / p.r) * dt;
+            });
+
+            points = points.filter(function (p) {
+              if (p.a > END) return true;
+              p.gone = true;
+              return false;
+            });
+            points.forEach(place);
+            connect();
+            moveSparks(dt);
+          }
+
+          function connect() {
+            var dot = dotSize();
+            links = [];
+            points.forEach(function (p) {
+              p.near = [];
+            });
+            for (var i = 0; i < points.length; i++) {
+              for (var j = i + 1; j < points.length; j++) {
+                var p = points[i];
+                var q = points[j];
+                var dx = q.x - p.x;
+                var dy = q.y - p.y;
+                var d = Math.sqrt(dx * dx + dy * dy);
+                if (d >= LINK || apart(p, q) || blocked(p, q, dot)) continue;
+                links.push({ p: p, q: q, d: d });
+                p.near.push(q);
+                q.near.push(p);
+              }
+            }
+          }
+
+          function strength(p, q) {
+            var dx = q.x - p.x;
+            var dy = q.y - p.y;
+            var d = Math.sqrt(dx * dx + dy * dy) / LINK;
+            return Math.max(0, 1 - d * d);
+          }
+
+          function nextHop(s) {
+            var options = s.at.near.filter(function (q) {
+              return q !== s.from && ahead(s.at, q);
+            });
+            if (!options.length) {
+              options = s.at.near.filter(function (q) {
+                return q !== s.from;
+              });
+            }
+            var total = options.reduce(function (sum, q) {
+              return sum + strength(s.at, q);
+            }, 0);
+            var pick = Math.random() * total;
+            for (var i = 0; i < options.length; i++) {
+              pick -= strength(s.at, options[i]);
+              if (pick <= 0) return options[i];
+            }
+            return options[options.length - 1] || null;
+          }
+
+          function moveSparks(dt) {
+            nextSpark -= dt;
+            if (nextSpark <= 0 && sparks.length < SPARK_MAX) {
+              var inputs = points.filter(function (p) {
+                return (
+                  START - p.a < INPUT &&
+                  p.near.some(function (q) {
+                    return ahead(p, q);
+                  })
+                );
+              });
+              if (inputs.length) {
+                sparks.push({
+                  at: inputs[Math.floor(Math.random() * inputs.length)],
+                  to: null,
+                  from: null,
+                  t: 0,
+                  wait: 0,
+                  stuck: 0,
+                  show: 0,
+                  leaving: false
+                });
+                nextSpark = SPARK_EVERY * (0.7 + Math.random() * 0.6);
+              } else {
+                nextSpark = 0.1;
+              }
+            }
+
+            sparks.forEach(function (s) {
+              s.show = s.leaving ? s.show - dt / 0.3 : Math.min(1, s.show + dt / 0.3);
+              if (s.leaving || s.at.gone) return;
+              if (s.to) {
+                if (s.to.gone || s.at.near.indexOf(s.to) === -1) {
+                  s.leaving = true;
+                  return;
+                }
+                var dx = s.to.x - s.at.x;
+                var dy = s.to.y - s.at.y;
+                s.t += (SPARK_SPEED * dt) / Math.max(1, Math.sqrt(dx * dx + dy * dy));
+                if (s.t >= 1) {
+                  s.from = s.at;
+                  s.at = s.to;
+                  s.to = null;
+                  s.t = 0;
+                  s.wait = SPARK_PAUSE;
+                }
+                return;
+              }
+              s.wait -= dt;
+              if (s.wait > 0) return;
+              s.to = nextHop(s);
+              if (s.to) {
+                s.stuck = 0;
+                return;
+              }
+              s.wait = 0.25;
+              s.stuck += 1;
+              if (s.stuck > 6) s.leaving = true;
+            });
+
+            sparks = sparks.filter(function (s) {
+              return !s.at.gone && (!s.leaving || s.show > 0);
+            });
+          }
+
+          function carrying(link) {
+            return sparks.some(function (s) {
+              return s.to && ((s.at === link.p && s.to === link.q) || (s.at === link.q && s.to === link.p));
+            });
+          }
+
+          function blocked(p, q, dot) {
+            var dx = q.x - p.x;
+            var dy = q.y - p.y;
+            var len2 = dx * dx + dy * dy;
+            var reach = dot * 2.2;
+            return points.some(function (o) {
+              if (o === p || o === q) return false;
+              var t = ((o.x - p.x) * dx + (o.y - p.y) * dy) / len2;
+              if (t <= 0 || t >= 1) return false;
+              var ox = p.x + t * dx - o.x;
+              var oy = p.y + t * dy - o.y;
+              return ox * ox + oy * oy < reach * reach;
+            });
+          }
+
+          function paint(ink, glow, rimmed) {
+            var px = 1 / scale;
+            var dot = dotSize();
+            var spark = Math.max(SPARK, 1.3 * px);
+            var rim = rimmed ? 0.9 * px : 0;
+
+            ctx.lineWidth = 1.4 * px;
+            ctx.lineCap = "round";
+            ctx.strokeStyle = ink;
+            links.forEach(function (link) {
+              var alpha = 0.85 * (1 - (link.d / LINK) * (link.d / LINK));
+              if (carrying(link)) alpha = Math.max(alpha, 0.45);
+              ctx.globalAlpha = alpha * Math.min(link.p.alpha, link.q.alpha);
+              ctx.beginPath();
+              ctx.moveTo(link.p.x, link.p.y);
+              ctx.lineTo(link.q.x, link.q.y);
+              ctx.stroke();
+            });
+
+            ctx.fillStyle = ink;
+            points.forEach(function (p) {
+              ctx.globalAlpha = p.alpha;
+              ctx.beginPath();
+              ctx.arc(p.x, p.y, dot, 0, Math.PI * 2);
+              ctx.fill();
+            });
+
+            sparks.forEach(function (s) {
+              var x = s.to ? s.at.x + (s.to.x - s.at.x) * s.t : s.at.x;
+              var y = s.to ? s.at.y + (s.to.y - s.at.y) * s.t : s.at.y;
+              var seen = s.to ? s.at.alpha + (s.to.alpha - s.at.alpha) * s.t : s.at.alpha;
+              ctx.globalAlpha = Math.max(0, Math.min(1, s.show * seen));
+              if (rim) {
+                ctx.fillStyle = ink;
+                ctx.beginPath();
+                ctx.arc(x, y, spark + rim, 0, Math.PI * 2);
+                ctx.fill();
+              }
+              ctx.fillStyle = glow;
+              ctx.beginPath();
+              ctx.arc(x, y, spark, 0, Math.PI * 2);
+              ctx.fill();
+            });
+            ctx.globalAlpha = 1;
+          }
+
+          function draw() {
+            ctx.setTransform(dpr * scale, 0, 0, dpr * scale, 0, 0);
+            ctx.clearRect(0, 0, BOX, BOX);
+
+            ctx.save();
+            ctx.clip(OPEN, "evenodd");
+            paint("#000", "#fff", false);
+            ctx.restore();
+
+            ctx.save();
+            ctx.clip(WEDGE);
+            paint("#fff", "#000", true);
+            ctx.restore();
+          }
+
+          function resize() {
+            var size = canvas.clientWidth;
+            if (!size) return;
+            dpr = Math.min(window.devicePixelRatio || 1, 2);
+            scale = size / BOX;
+            canvas.width = Math.round(size * dpr);
+            canvas.height = Math.round(size * dpr);
+            draw();
+          }
+
+          function loop(now) {
+            frame = 0;
+            if (!onScreen || still.matches) return;
+            var dt = last ? Math.min((now - last) / 1000, 0.05) : 0;
+            last = now;
+            step(dt);
+            draw();
+            frame = requestAnimationFrame(loop);
+          }
+
+          function play() {
+            if (frame || !onScreen || still.matches) return;
+            last = 0;
+            frame = requestAnimationFrame(loop);
+          }
+
+          for (var warm = 0; warm < 1050; warm++) step(1 / 30);
+
+          new ResizeObserver(resize).observe(canvas);
+          new IntersectionObserver(function (entries) {
+            onScreen = entries[0].isIntersecting;
+            play();
+          }).observe(canvas);
+          if (still.addEventListener) still.addEventListener("change", play);
+          play();
+        }
       })();
     </script>
   </body>
