@@ -40,7 +40,6 @@
           document.documentElement.dataset.lang = lang;
           document.documentElement.lang = lang === "de" ? "de" : "en";
         }
-        if (localStorage.getItem("oc-design") === "1") document.documentElement.dataset.design = "1";
         document.documentElement.style.setProperty("--app-height", window.innerHeight + "px");
       })();
     </script>
@@ -126,6 +125,7 @@
         background: #1d2a1c url("assets/background.jpg") center / cover no-repeat;
       }
 
+      .bg-water,
       .bg-fx,
       .bg-light,
       .bg-warm,
@@ -134,6 +134,7 @@
         opacity: 0;
       }
 
+      .bg.is-live .bg-water,
       .bg.is-live .bg-fx,
       .bg.is-live .bg-light,
       .bg.is-live .bg-warm,
@@ -143,6 +144,11 @@
 
       .bg.is-live .bg-cam {
         will-change: transform;
+      }
+
+      .bg-water {
+        right: auto;
+        bottom: auto;
       }
 
       .bg-fx {
@@ -259,10 +265,9 @@
         height: var(--app-height);
         overflow-x: hidden;
         overflow-y: auto;
-        scroll-snap-type: y mandatory;
         overscroll-behavior-y: contain;
         -webkit-overflow-scrolling: touch;
-        touch-action: pan-y;
+        touch-action: pan-y pinch-zoom;
       }
 
       .slide {
@@ -270,8 +275,6 @@
         z-index: 1;
         height: var(--app-height);
         min-height: var(--app-height);
-        scroll-snap-align: start;
-        scroll-snap-stop: always;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -295,8 +298,7 @@
       }
 
       .lang-button,
-      .lang-option,
-      .design-option {
+      .lang-option {
         appearance: none;
         -webkit-appearance: none;
         display: inline-block;
@@ -337,19 +339,16 @@
       .lang-option:active,
       .lang-option:focus-visible,
       .lang-option.is-active,
-      .design-wrap.is-open .design-button,
-      .design-option:hover,
-      .design-option:active,
-      .design-option:focus-visible,
-      .design-option.is-active {
+      .llm-button:hover,
+      .llm-button:active,
+      .llm-button:focus-visible {
         background: #fff;
         backdrop-filter: none;
         -webkit-backdrop-filter: none;
         outline: none;
       }
 
-      .lang-menu,
-      .design-menu {
+      .lang-menu {
         position: absolute;
         top: calc(100% + 0.55rem);
         left: 0;
@@ -364,20 +363,17 @@
         list-style: none;
       }
 
-      html.lang-open .slides,
-      html.design-open .slides {
+      html.lang-open .slides {
         visibility: hidden;
         pointer-events: none;
       }
 
       html.lang-open .lang-wrap,
-      html.lang-open .design-wrap,
-      html.design-open .lang-wrap,
-      html.design-open .design-wrap {
+      html.lang-open .llm-wrap {
         visibility: visible;
       }
 
-      .design-wrap {
+      .llm-wrap {
         position: fixed;
         z-index: 3;
         top: calc(1.1rem + env(safe-area-inset-top, 0px));
@@ -388,7 +384,7 @@
         pointer-events: auto;
       }
 
-      .design-button {
+      .llm-button {
         appearance: none;
         -webkit-appearance: none;
         display: inline-flex;
@@ -415,8 +411,7 @@
         user-select: none;
       }
 
-      .lang-menu[hidden],
-      .design-menu[hidden] {
+      .lang-menu[hidden] {
         display: none;
       }
 
@@ -428,8 +423,7 @@
         }
 
         .lang-button,
-        .lang-option,
-        .design-option {
+        .lang-option {
           padding: 0.65rem 1.35rem;
           font-size: 1.05rem;
         }
@@ -440,13 +434,13 @@
           padding-bottom: 0;
         }
 
-        .design-wrap {
+        .llm-wrap {
           top: calc(1.5rem + env(safe-area-inset-top, 0px));
           left: calc(1.85rem + env(safe-area-inset-left, 0px));
           height: 3rem;
         }
 
-        .design-button {
+        .llm-button {
           height: 2.69rem;
           padding: 0 1.35rem;
           font-size: 1.05rem;
@@ -717,7 +711,8 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        gap: 0.45rem;
+        gap: 0.3em;
+        font-size: clamp(1.7rem, 3vw, 2.7rem);
       }
 
       .x-widget:active {
@@ -728,13 +723,13 @@
       }
 
       .x-mark {
-        width: 1.35rem;
-        height: 1.35rem;
+        width: 0.8em;
+        height: 0.8em;
         flex: none;
       }
 
       .x-name {
-        font-size: 1.15rem;
+        font-size: 0.85em;
         font-weight: 700;
         line-height: 1;
       }
@@ -770,13 +765,8 @@
           font-size: min(5.8vw, 1.7rem);
         }
 
-        .x-mark {
-          width: 1.1rem;
-          height: 1.1rem;
-        }
-
-        .x-name {
-          font-size: 1rem;
+        .x-line {
+          font-size: min(5.8vw, 1.7rem);
         }
       }
 
@@ -791,6 +781,7 @@
   <body>
     <div class="bg" aria-hidden="true">
       <div class="bg-cam bg-photo"></div>
+      <canvas class="bg-cam bg-water"></canvas>
       <canvas class="bg-fx"></canvas>
       <div class="bg-cam bg-light">
         <div class="bg-rays bg-rays-back"></div>
@@ -802,18 +793,10 @@
     </div>
     <main class="slides">
       <section class="slide" data-slide="start">
-        <div class="design-wrap" id="design-switch">
-          <button type="button" class="design-button" id="design-button" aria-expanded="false" aria-controls="design-menu">
-            <span data-copy="design">Design</span>
+        <div class="llm-wrap" id="llm-switch">
+          <button type="button" class="llm-button" id="llm-button">
+            <span data-copy="forLlm">For LLM</span>
           </button>
-          <ul class="design-menu" id="design-menu" hidden>
-            <li>
-              <button type="button" class="design-option" data-design-set="1">Design 1</button>
-            </li>
-            <li>
-              <button type="button" class="design-option">Design 2</button>
-            </li>
-          </ul>
         </div>
         <div class="lang-wrap" id="lang-switch">
           <button type="button" class="lang-button" id="lang-button" aria-expanded="false" aria-controls="lang-menu">
@@ -888,6 +871,86 @@
         </div>
       </section>
     </main>
+    <script type="x-shader/x-vertex" id="water-vertex">
+      attribute vec2 aPos;
+      attribute vec2 aUv;
+      varying vec2 vUv;
+
+      void main() {
+        vUv = aUv;
+        gl_Position = vec4(aPos, 0.0, 1.0);
+      }
+    </script>
+    <script type="x-shader/x-fragment" id="water-fragment">
+      #ifdef GL_FRAGMENT_PRECISION_HIGH
+      precision highp float;
+      #else
+      precision mediump float;
+      #endif
+
+      uniform sampler2D uPhoto;
+      uniform sampler2D uMask;
+      uniform vec2 uSize;
+      uniform float uTime;
+      uniform float uGlint;
+      uniform vec4 uRings[3];
+      varying vec2 vUv;
+
+      float hash(vec2 cell) {
+        return fract(sin(dot(cell, vec2(12.9898, 78.233))) * 43758.5453);
+      }
+
+      void main() {
+        vec4 mask = texture2D(uMask, vUv);
+        if (mask.r < 0.004) {
+          gl_FragColor = vec4(0.0);
+          return;
+        }
+
+        vec2 p = vUv * uSize;
+        float t = uTime;
+        float near = clamp((p.y - 354.0) / 104.0, 0.0, 1.0);
+        float f = mix(1.3, 0.75, near);
+        float a = p.y * f + t * 2.0 + sin(p.x * 0.05 + t * 0.3) * 2.0 + sin(p.x * 0.13 - t * 0.5) * 0.8;
+        float b = p.y * f * 1.9 - t * 2.8 + p.x * 0.08;
+        float c = p.x * 0.021 - p.y * 0.35 + t * 0.9;
+        float wave = sin(a) * 0.6 + sin(b) * 0.3 + sin(c) * 0.1;
+        float slope = cos(a) * 0.6 * f + cos(b) * 0.57 * f - cos(c) * 0.035;
+
+        vec2 push = vec2(0.0);
+        float ring = 0.0;
+        for (int i = 0; i < 3; i++) {
+          vec4 r = uRings[i];
+          if (r.w <= 0.0) continue;
+          vec2 d = (p - r.xy) * vec2(1.0, 2.6);
+          float dist = length(d);
+          float edge = dist - r.z * 9.0;
+          float h = sin(edge * 1.8) * exp(-edge * edge / 14.0) * exp(-r.z * 0.45) * r.w;
+          ring += h;
+          push += vec2(d.x, d.y / 2.6) / max(dist, 0.001) * h;
+        }
+
+        float gust = 0.75 + 0.25 * sin(p.x * 0.012 - t * 0.25);
+        float amp = mix(1.8, 3.4, near) * gust * mask.g;
+        vec2 shift = vec2(0.35, 1.0) * wave * amp + push * 2.4 * mask.g;
+        vec3 color = texture2D(uPhoto, vUv + shift / uSize).rgb;
+        float patch = 0.55 + 0.45 * sin(p.x * 0.09 + sin(p.y * 0.21 + t * 0.4) * 1.5 + t * 0.6);
+        color *= 1.0 + (slope * 0.065 * mix(0.6, 1.0, near) * gust * patch + ring * 0.15) * mask.g;
+
+        vec2 grid = p / vec2(5.0, 2.5);
+        vec2 cell = floor(grid);
+        float seed = hash(cell);
+        float jitter = hash(cell + 17.0);
+        vec2 center = 0.34 + 0.32 * vec2(seed, jitter);
+        float spot = smoothstep(0.34, 0.0, length((fract(grid) - center) * vec2(1.0, 1.8)));
+        float flash = pow(max(0.0, sin(t * (1.0 + 2.0 * jitter) + seed * 40.0)), 10.0);
+        float crest = smoothstep(0.0, 0.8, wave);
+        float glint = spot * flash * crest * step(0.5, seed) * mask.g * uGlint;
+        color = mix(color, vec3(0.95, 0.97, 1.0), clamp(glint * 1.4, 0.0, 1.0));
+
+        gl_FragColor = vec4(color * mask.r, mask.r);
+      }
+    </script>
     <script>
       (function () {
         var copy = {
@@ -900,7 +963,7 @@
             seconds: "Seconds",
             release: "Release date",
             contact: "Get in touch",
-            design: "Design"
+            forLlm: "For LLM"
           },
           de: {
             slogan: "Die Basis für menschenzentrierte Lösungen",
@@ -911,7 +974,7 @@
             seconds: "Sekunden",
             release: "Release-Datum",
             contact: "Kontakt aufnehmen",
-            design: "Design"
+            forLlm: "For LLM"
           }
         };
 
@@ -919,9 +982,7 @@
         var langSwitch = document.getElementById("lang-switch");
         var langButton = document.getElementById("lang-button");
         var langMenu = document.getElementById("lang-menu");
-        var designSwitch = document.getElementById("design-switch");
-        var designButton = document.getElementById("design-button");
-        var designMenu = document.getElementById("design-menu");
+        var llmSwitch = document.getElementById("llm-switch");
         var slogan = document.getElementById("slogan");
         var lockup = document.querySelector(".lockup");
         var themeMeta = document.querySelector('meta[name="theme-color"]');
@@ -971,6 +1032,22 @@
           matchXWidget();
         }
 
+        function setPx(node, prop, value) {
+          var current = parseFloat(node.style[prop]);
+          if (Math.abs(current - value) < 0.005) return;
+          node.style[prop] = value.toFixed(2) + "px";
+        }
+
+        var matchQueued = false;
+        function queueMatchXWidget() {
+          if (matchQueued) return;
+          matchQueued = true;
+          requestAnimationFrame(function () {
+            matchQueued = false;
+            matchXWidget();
+          });
+        }
+
         function matchXWidget() {
           var board = document.querySelector(".end-board");
           var timer = document.querySelector(".timer-widget");
@@ -981,12 +1058,14 @@
           release.style.height = "max-content";
           xWidget.style.width = "max-content";
           xWidget.style.height = "max-content";
-          var cardW = Math.max(release.offsetWidth, xWidget.offsetWidth);
-          var cardH = Math.max(release.offsetHeight, xWidget.offsetHeight);
-          release.style.width = cardW + "px";
-          release.style.height = cardH + "px";
-          xWidget.style.width = cardW + "px";
-          xWidget.style.height = cardH + "px";
+          var relRect = release.getBoundingClientRect();
+          var xRect = xWidget.getBoundingClientRect();
+          var cardW = Math.max(relRect.width, xRect.width);
+          var cardH = Math.max(relRect.height, xRect.height);
+          setPx(release, "width", cardW);
+          setPx(release, "height", cardH);
+          setPx(xWidget, "width", cardW);
+          setPx(xWidget, "height", cardH);
 
           var left = Infinity;
           var right = -Infinity;
@@ -1018,7 +1097,7 @@
           probe.remove();
 
           var natural = (width - border) / (gridWidth / 100 + pad);
-          timer.style.width = width + "px";
+          setPx(timer, "width", width);
           timer.style.fontSize = natural + "px";
 
           var slide = timer.closest(".slide");
@@ -1154,7 +1233,7 @@
           fitSlogan();
           matchXWidget();
         });
-        new ResizeObserver(matchXWidget).observe(document.querySelector(".release-widget"));
+        new ResizeObserver(queueMatchXWidget).observe(document.querySelector(".release-widget"));
 
         var viewportWidth = window.innerWidth;
         var viewportHeight = window.innerHeight;
@@ -1171,36 +1250,22 @@
           }
           if (widthChanged) {
             fitSlogan();
-            matchXWidget();
+            queueMatchXWidget();
           } else if (heightChanged) {
             fitLockup();
           }
         }
 
         function setLangOpen(open) {
-          if (open) setDesignOpen(false);
           langSwitch.classList.toggle("is-open", open);
           root.classList.toggle("lang-open", open);
           langButton.setAttribute("aria-expanded", String(open));
           langMenu.hidden = !open;
         }
 
-        function setDesignOpen(open) {
-          if (open) setLangOpen(false);
-          designSwitch.classList.toggle("is-open", open);
-          root.classList.toggle("design-open", open);
-          designButton.setAttribute("aria-expanded", String(open));
-          designMenu.hidden = !open;
-        }
-
         langButton.addEventListener("click", function (event) {
           event.stopPropagation();
           setLangOpen(langMenu.hidden);
-        });
-
-        designButton.addEventListener("click", function (event) {
-          event.stopPropagation();
-          setDesignOpen(designMenu.hidden);
         });
 
         langMenu.addEventListener("click", function (event) {
@@ -1212,50 +1277,50 @@
           render();
         });
 
-        function design() {
-          return root.dataset.design || "";
-        }
-
-        function setDesign(value) {
-          if (value) {
-            root.dataset.design = value;
-            localStorage.setItem("oc-design", value);
-          } else {
-            delete root.dataset.design;
-            localStorage.removeItem("oc-design");
-          }
-          designMenu.querySelectorAll("[data-design-set]").forEach(function (button) {
-            button.classList.toggle("is-active", button.dataset.designSet === value);
-          });
-          if (scene) scene.set(value === "1");
-        }
-
-        designMenu.addEventListener("click", function (event) {
-          var button = event.target.closest("button");
-          if (!button) return;
-          var value = button.dataset.designSet;
-          if (value) setDesign(design() === value ? "" : value);
-          setDesignOpen(false);
-        });
-
         document.addEventListener("click", function (event) {
           if (!langSwitch.contains(event.target)) setLangOpen(false);
-          if (!designSwitch.contains(event.target)) setDesignOpen(false);
         });
 
         var slides = document.querySelector(".slides");
         function placeLang() {
           var shift = "translateY(" + -slides.scrollTop + "px)";
           langSwitch.style.transform = shift;
-          designSwitch.style.transform = shift;
+          llmSwitch.style.transform = shift;
         }
         slides.addEventListener("scroll", placeLang, { passive: true });
         placeLang();
 
+        var calmMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+        var adjustTimer = 0;
+        function nearestSlideTop() {
+          var top = slides.scrollTop;
+          var best = 0;
+          var bestDist = Infinity;
+          var nodes = slides.querySelectorAll(".slide");
+          for (var i = 0; i < nodes.length; i++) {
+            var dist = Math.abs(nodes[i].offsetTop - top);
+            if (dist < bestDist) {
+              bestDist = dist;
+              best = nodes[i].offsetTop;
+            }
+          }
+          return best;
+        }
+        function adjustScroll() {
+          adjustTimer = 0;
+          var target = nearestSlideTop();
+          if (Math.abs(target - slides.scrollTop) < 1) return;
+          slides.scrollTo({ top: target, behavior: calmMotion.matches ? "auto" : "smooth" });
+        }
+        function scheduleAdjust() {
+          if (adjustTimer) clearTimeout(adjustTimer);
+          adjustTimer = setTimeout(adjustScroll, 140);
+        }
+        slides.addEventListener("scroll", scheduleAdjust, { passive: true });
+
         document.addEventListener("keydown", function (event) {
           if (event.key === "Escape") {
             setLangOpen(false);
-            setDesignOpen(false);
           }
         });
 
@@ -1296,7 +1361,7 @@
         if (flowCanvas) startLogoFlow(flowCanvas);
 
         var scene = startScene(document.querySelector(".bg"));
-        setDesign(design());
+        if (scene) scene.set(true);
 
         function startLogoFlow(canvas) {
           var ctx = canvas.getContext("2d");
@@ -1666,6 +1731,7 @@
           var rays = bg.querySelectorAll(".bg-rays");
           var warm = bg.querySelector(".bg-warm");
           var grade = bg.querySelector(".bg-grade");
+          var waterCanvas = bg.querySelector(".bg-water");
           var still = window.matchMedia("(prefers-reduced-motion: reduce)");
 
           var TAU = Math.PI * 2;
@@ -1677,14 +1743,8 @@
           var MIST_W = 512;
           var MIST_H = 160;
           var MISTS = [
-            { seed: 11, cells: 5, y: 0.33, h: 0.36, alpha: 0.55, speed: 6, depth: 1.15 },
-            { seed: 29, cells: 4, y: 0.5, h: 0.56, alpha: 0.4, speed: 15, depth: 1.6 }
-          ];
-          var SHADE = { seed: 47, cells: 2, alpha: 0.3, speed: 11 };
-          var LAKE = [
-            { u: 0.53, v: 0.52, ru: 0.075, rv: 0.035, share: 0.25 },
-            { u: 0.7, v: 0.532, ru: 0.065, rv: 0.016, share: 0.35 },
-            { u: 0.855, v: 0.53, ru: 0.045, rv: 0.04, share: 0.4 }
+            { seed: 11, cells: 5, y: 0.14, h: 0.32, alpha: 0.5, speed: 26, depth: 1.15 },
+            { seed: 29, cells: 4, y: 0.58, h: 0.56, alpha: 0.4, speed: 46, depth: 1.6 }
           ];
 
           var on = false;
@@ -1697,20 +1757,15 @@
           var height = 0;
           var dpr = 1;
           var unit = 1;
-          var sunX = 0;
-          var sunY = 0;
           var progress = 0;
           var lookX = 0;
           var lookY = 0;
           var aimX = 0;
           var aimY = 0;
           var textures = null;
-          var shade = null;
-          var spark = null;
-          var disc = null;
-          var motes = [];
-          var blurs = [];
-          var glints = [];
+          var water = startWater(waterCanvas, PHOTO_W, PHOTO_H);
+          var waterSince = -1;
+          var waterShown = "";
 
           function clamp(value, low, high) {
             return Math.max(low, Math.min(high, value));
@@ -1803,95 +1858,6 @@
             });
           }
 
-          function makeShade() {
-            return makeNoise({
-              seed: SHADE.seed,
-              cells: SHADE.cells,
-              width: 256,
-              height: 160,
-              stretch: 1.3,
-              color: [6, 20, 16],
-              low: 0.46,
-              high: 0.76,
-              band: function (v) {
-                return smooth(0.14, 0.4, v);
-              }
-            });
-          }
-
-          function makeSprite(stops) {
-            var sprite = document.createElement("canvas");
-            sprite.width = 64;
-            sprite.height = 64;
-            var paintSprite = sprite.getContext("2d");
-            var fill = paintSprite.createRadialGradient(32, 32, 0, 32, 32, 32);
-            stops.forEach(function (stop) {
-              fill.addColorStop(stop[0], stop[1]);
-            });
-            paintSprite.fillStyle = fill;
-            paintSprite.fillRect(0, 0, 64, 64);
-            return sprite;
-          }
-
-          function makeMote() {
-            var z = Math.pow(Math.random(), 1.7);
-            return {
-              x: Math.random() * 1.1,
-              y: Math.random() * 1.1,
-              z: z,
-              size: 10 + z * 24,
-              vx: -(3 + z * 10),
-              vy: -(2 + z * 7),
-              sway: 3 + z * 12,
-              swayRate: 0.05 + Math.random() * 0.1,
-              rate: 0.12 + Math.random() * 0.35,
-              phase: Math.random() * TAU,
-              glow: 0.7 + z * 0.3
-            };
-          }
-
-          function makeBlur() {
-            return {
-              x: Math.random() * 1.1,
-              y: Math.random() * 1.1,
-              size: 90 + Math.random() * 110,
-              vx: -(5 + Math.random() * 6),
-              vy: -(3 + Math.random() * 4),
-              rate: 0.05 + Math.random() * 0.08,
-              phase: Math.random() * TAU,
-              glow: 0.1 + Math.random() * 0.08
-            };
-          }
-
-          function makeGlint() {
-            var pick = Math.random();
-            var pool = LAKE[0];
-            for (var l = 0; l < LAKE.length; l++) {
-              pool = LAKE[l];
-              if (pick < pool.share) break;
-              pick -= pool.share;
-            }
-            var angle = Math.random() * TAU;
-            var reach = Math.sqrt(Math.random());
-            return {
-              u: pool.u + Math.cos(angle) * reach * pool.ru,
-              v: pool.v + Math.sin(angle) * reach * pool.rv,
-              size: 4 + Math.random() * 6,
-              rate: 0.2 + Math.random() * 0.45,
-              phase: Math.random() * TAU
-            };
-          }
-
-          function populate() {
-            var count = Math.round(clamp((width * height) / 17000, 24, 110));
-            while (motes.length < count) motes.push(makeMote());
-            motes.length = count;
-            var discs = width > 700 ? 6 : 3;
-            while (blurs.length < discs) blurs.push(makeBlur());
-            blurs.length = discs;
-            while (glints.length < 46) glints.push(makeGlint());
-          }
-
           function resize() {
             width = bg.clientWidth;
             height = bg.clientHeight;
@@ -1900,12 +1866,12 @@
             unit = clamp(Math.min(width, height) / 900, 0.6, 1.3);
             canvas.width = Math.round(width * dpr);
             canvas.height = Math.round(height * dpr);
+            if (water) water.place(width, height, dpr);
             var fit = Math.max(width / PHOTO_W, height / PHOTO_H);
-            sunX = clamp((width - PHOTO_W * fit) / 2 + SUN_U * PHOTO_W * fit, width * 0.62, width * 0.97);
-            sunY = clamp((height - PHOTO_H * fit) / 2 + SUN_V * PHOTO_H * fit, -height * 0.06, height * 0.04);
+            var sunX = clamp((width - PHOTO_W * fit) / 2 + SUN_U * PHOTO_W * fit, width * 0.62, width * 0.97);
+            var sunY = clamp((height - PHOTO_H * fit) / 2 + SUN_V * PHOTO_H * fit, -height * 0.06, height * 0.04);
             bg.style.setProperty("--sun-x", sunX.toFixed(1) + "px");
             bg.style.setProperty("--sun-y", sunY.toFixed(1) + "px");
-            populate();
           }
 
           function aimProgress() {
@@ -1913,84 +1879,28 @@
             return room > 0 ? clamp(slides.scrollTop / room, 0, 1) : 0;
           }
 
-          function drift(item, dt) {
-            item.x = wrap(item.x + (item.vx * unit * dt) / width, 1.1);
-            item.y = wrap(item.y + (item.vy * unit * dt) / height, 1.1);
-          }
-
-          function step(dt) {
-            clock += dt;
-            for (var i = 0; i < motes.length; i++) drift(motes[i], dt);
-            for (var j = 0; j < blurs.length; j++) drift(blurs[j], dt);
-          }
-
-          function drawFx(k, zoom, camX, camY) {
+          function drawFx(k, camX, camY) {
             ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-            ctx.globalCompositeOperation = "source-over";
-            ctx.globalAlpha = 1;
             ctx.clearRect(0, 0, width, height);
-
-            var shadeW = width * 1.8;
-            ctx.globalAlpha = SHADE.alpha * k;
-            for (var s = wrap(camX - clock * SHADE.speed * unit, shadeW) - shadeW; s < width; s += shadeW) {
-              ctx.drawImage(shade, s, camY - height * 0.1, shadeW, height * 1.2);
-            }
 
             var thin = k * (1 - 0.3 * progress);
             for (var m = 0; m < MISTS.length; m++) {
               var mist = MISTS[m];
               var tall = mist.h * height;
               var wide = (tall * MIST_W) / MIST_H;
-              var top = mist.y * height + camY * mist.depth;
-              ctx.globalAlpha = mist.alpha * thin;
-              for (var x = wrap(camX * mist.depth - clock * mist.speed * unit, wide) - wide; x < width; x += wide) {
-                ctx.drawImage(textures[m], x, top, wide, tall);
+              for (var s = 0; s < 2; s++) {
+                var flip = s === 1;
+                var top = mist.y * height + camY * mist.depth + Math.sin((clock * TAU) / (flip ? 21 : 15) + m * 1.7) * height * 0.02;
+                var offset = camX * mist.depth - clock * mist.speed * (flip ? 0.4 : 1) * unit;
+                ctx.globalAlpha = mist.alpha * thin * (flip ? 0.45 : 0.65) * (0.7 + 0.3 * Math.sin((clock * TAU) / (flip ? 13 : 9) + m));
+                if (flip) ctx.setTransform(-dpr, 0, 0, dpr, width * dpr, 0);
+                for (var x = wrap(flip ? -offset : offset, wide) - wide; x < width; x += wide) {
+                  ctx.drawImage(textures[m], x, top, wide, tall);
+                }
+                if (flip) ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
               }
             }
-
-            ctx.globalCompositeOperation = "lighter";
-            var glow = k * (0.9 + 0.3 * progress);
-            var fit = Math.max(width / PHOTO_W, height / PHOTO_H);
-            var photoLeft = (width - PHOTO_W * fit) / 2;
-            var photoTop = (height - PHOTO_H * fit) / 2;
-            for (var g = 0; g < glints.length; g++) {
-              var glint = glints[g];
-              var flash = Math.sin(clock * glint.rate * TAU + glint.phase);
-              if (flash < 0.45) continue;
-              var gx = width / 2 + (photoLeft + glint.u * PHOTO_W * fit - width / 2) * zoom + camX;
-              var gy = height / 2 + (photoTop + glint.v * PHOTO_H * fit - height / 2) * zoom + camY;
-              var streak = glint.size * unit * zoom;
-              ctx.globalAlpha = Math.min(1, glow * 1.2 * Math.pow((flash - 0.45) / 0.55, 2));
-              ctx.drawImage(spark, gx - streak * 1.6, gy - streak / 2, streak * 3.2, streak);
-            }
-
-            var litX = width / 2 + (sunX - width / 2) * zoom + camX;
-            var litY = height / 2 + (sunY - height / 2) * zoom + camY;
-            var reach = Math.hypot(width, height);
-            for (var i = 0; i < motes.length; i++) {
-              var mote = motes[i];
-              var depth = 0.6 + mote.z * 1.8;
-              var mx =
-                (wrap(mote.x + (camX * depth) / width, 1.1) - 0.05) * width +
-                Math.sin(clock * mote.swayRate * TAU + mote.phase) * mote.sway * unit;
-              var my = (wrap(mote.y + (camY * depth) / height, 1.1) - 0.05) * height;
-              var near = Math.hypot(mx - litX, my - litY) / reach;
-              var lit = 0.3 + 0.7 * Math.exp(-(near * near) / 0.2);
-              var twinkle = 0.55 + 0.45 * Math.sin(clock * mote.rate * TAU + mote.phase);
-              var dot = mote.size * unit;
-              ctx.globalAlpha = Math.min(1, mote.glow * lit * twinkle * glow);
-              ctx.drawImage(spark, mx - dot / 2, my - dot / 2, dot, dot);
-            }
-            for (var b = 0; b < blurs.length; b++) {
-              var blur = blurs[b];
-              var bx = (wrap(blur.x + (camX * 2.6) / width, 1.1) - 0.05) * width;
-              var by = (wrap(blur.y + (camY * 2.6) / height, 1.1) - 0.05) * height;
-              var disk = blur.size * unit;
-              ctx.globalAlpha = blur.glow * glow * (0.7 + 0.3 * Math.sin(clock * blur.rate * TAU + blur.phase));
-              ctx.drawImage(disc, bx - disk / 2, by - disk / 2, disk, disk);
-            }
             ctx.globalAlpha = 1;
-            ctx.globalCompositeOperation = "source-over";
           }
 
           function paint() {
@@ -2006,6 +1916,7 @@
             if (k !== shown) {
               shown = k;
               photo.style.filter = "saturate(" + (1 + 0.12 * k).toFixed(3) + ") contrast(" + (1 + 0.08 * k).toFixed(3) + ")";
+              waterCanvas.style.filter = photo.style.filter;
               light.style.opacity = k.toFixed(3);
               grade.style.opacity = k.toFixed(3);
             }
@@ -2016,13 +1927,24 @@
             rays[1].style.opacity = ((0.52 + 0.25 * p) * (0.85 + 0.15 * Math.sin((t * TAU) / 13))).toFixed(3);
             rays[1].style.transform = "rotate(" + (1.2 * Math.sin((t * TAU) / 23)).toFixed(3) + "deg)";
 
-            drawFx(k, zoom, camX, camY);
+            var flowing = !!water && !still.matches && water.draw(t, 1 + 0.2 * p);
+            if (flowing && waterSince < 0) waterSince = t;
+            var level = flowing ? (k * clamp((t - waterSince) / 1.2, 0, 1)).toFixed(3) : "0";
+            if (level !== waterShown) {
+              waterShown = level;
+              waterCanvas.style.opacity = level;
+            }
+
+            drawFx(k, camX, camY);
           }
 
           function rest() {
             bg.classList.remove("is-live");
             for (var c = 0; c < cams.length; c++) cams[c].style.transform = "";
             photo.style.filter = "";
+            waterCanvas.style.filter = "";
+            waterCanvas.style.opacity = "";
+            waterShown = "";
             light.style.opacity = "";
             warm.style.opacity = "";
             grade.style.opacity = "";
@@ -2045,7 +1967,7 @@
               lookX = 0;
               lookY = 0;
             } else {
-              step(dt);
+              clock += dt;
               progress += (aimProgress() - progress) * (1 - Math.exp(-dt * 2.6));
               var glide = 1 - Math.exp(-dt * 2.2);
               lookX += (aimX - lookX) * glide;
@@ -2064,22 +1986,7 @@
           function set(next) {
             on = next;
             if (on && !bg.classList.contains("is-live")) {
-              if (!textures) {
-                textures = MISTS.map(makeMist);
-                shade = makeShade();
-                spark = makeSprite([
-                  [0, "rgba(255, 251, 238, 1)"],
-                  [0.16, "rgba(255, 244, 212, 0.9)"],
-                  [0.42, "rgba(255, 230, 184, 0.22)"],
-                  [1, "rgba(255, 230, 184, 0)"]
-                ]);
-                disc = makeSprite([
-                  [0, "rgba(255, 240, 210, 0.5)"],
-                  [0.72, "rgba(255, 240, 210, 0.56)"],
-                  [0.88, "rgba(255, 244, 222, 0.8)"],
-                  [1, "rgba(255, 244, 222, 0)"]
-                ]);
-              }
+              if (!textures) textures = MISTS.map(makeMist);
               bg.classList.add("is-live");
               resize();
               progress = aimProgress();
@@ -2111,6 +2018,184 @@
           }).observe(bg);
 
           return { set: set };
+        }
+
+        function startWater(canvas, photoW, photoH) {
+          var BOX = [0.43, 0.455, 0.94, 0.605];
+          var gl = canvas.getContext("webgl", {
+            alpha: true,
+            premultipliedAlpha: true,
+            antialias: false,
+            depth: false,
+            stencil: false,
+            powerPreference: "low-power"
+          });
+          if (!gl) return null;
+
+          var photo = new Image();
+          var mask = new Image();
+          var loaded = 0;
+          var ready = false;
+          var visible = false;
+          var quad = null;
+          var uTime = null;
+          var uGlint = null;
+          var uRings = null;
+          var rings = [[0, 0, -99], [0, 0, -99], [0, 0, -99]];
+          var ringData = new Float32Array(12);
+          var nextRing = 2;
+          var spots = [];
+
+          function compile(type, id) {
+            var shader = gl.createShader(type);
+            gl.shaderSource(shader, document.getElementById(id).textContent);
+            gl.compileShader(shader);
+            return gl.getShaderParameter(shader, gl.COMPILE_STATUS) ? shader : null;
+          }
+
+          function texture(unit, image) {
+            gl.activeTexture(gl.TEXTURE0 + unit);
+            gl.bindTexture(gl.TEXTURE_2D, gl.createTexture());
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+            gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);
+          }
+
+          function setup() {
+            ready = false;
+            if (loaded < 2 || gl.isContextLost()) return;
+            var vertex = compile(gl.VERTEX_SHADER, "water-vertex");
+            var fragment = compile(gl.FRAGMENT_SHADER, "water-fragment");
+            if (!vertex || !fragment) return;
+            var program = gl.createProgram();
+            gl.attachShader(program, vertex);
+            gl.attachShader(program, fragment);
+            gl.linkProgram(program);
+            if (!gl.getProgramParameter(program, gl.LINK_STATUS)) return;
+            gl.useProgram(program);
+            try {
+              gl.pixelStorei(gl.UNPACK_COLORSPACE_CONVERSION_WEBGL, gl.BROWSER_DEFAULT_WEBGL);
+              texture(0, photo);
+              gl.pixelStorei(gl.UNPACK_COLORSPACE_CONVERSION_WEBGL, gl.NONE);
+              texture(1, mask);
+            } catch (error) {
+              return;
+            }
+            gl.uniform1i(gl.getUniformLocation(program, "uPhoto"), 0);
+            gl.uniform1i(gl.getUniformLocation(program, "uMask"), 1);
+            gl.uniform2f(gl.getUniformLocation(program, "uSize"), photoW, photoH);
+            uTime = gl.getUniformLocation(program, "uTime");
+            uGlint = gl.getUniformLocation(program, "uGlint");
+            uRings = gl.getUniformLocation(program, "uRings");
+            gl.bindBuffer(gl.ARRAY_BUFFER, gl.createBuffer());
+            var aPos = gl.getAttribLocation(program, "aPos");
+            var aUv = gl.getAttribLocation(program, "aUv");
+            gl.enableVertexAttribArray(aPos);
+            gl.enableVertexAttribArray(aUv);
+            gl.vertexAttribPointer(aPos, 2, gl.FLOAT, false, 16, 0);
+            gl.vertexAttribPointer(aUv, 2, gl.FLOAT, false, 16, 8);
+            if (quad) gl.bufferData(gl.ARRAY_BUFFER, quad, gl.STATIC_DRAW);
+            ready = true;
+          }
+
+          function load() {
+            loaded += 1;
+            setup();
+          }
+
+          function findSpots() {
+            var probe = document.createElement("canvas");
+            probe.width = photoW / 4;
+            probe.height = photoH / 4;
+            var paintProbe = probe.getContext("2d");
+            paintProbe.drawImage(mask, 0, 0, probe.width, probe.height);
+            try {
+              var data = paintProbe.getImageData(0, 0, probe.width, probe.height).data;
+            } catch (error) {
+              return;
+            }
+            for (var i = 0; i < data.length; i += 4) {
+              if (data[i + 1] < 230) continue;
+              var cell = i / 4;
+              spots.push([(cell % probe.width) * 4 + 2, Math.floor(cell / probe.width) * 4 + 2]);
+            }
+          }
+
+          function stir(time) {
+            if (spots.length && time >= nextRing) {
+              var slot = rings[0];
+              for (var r = 1; r < rings.length; r++) {
+                if (rings[r][2] < slot[2]) slot = rings[r];
+              }
+              var spot = spots[Math.floor(Math.random() * spots.length)];
+              slot[0] = spot[0];
+              slot[1] = spot[1];
+              slot[2] = time;
+              nextRing = time + 3.5 + Math.random() * 3.5;
+            }
+            for (var i = 0; i < rings.length; i++) {
+              var age = time - rings[i][2];
+              ringData[i * 4] = rings[i][0];
+              ringData[i * 4 + 1] = rings[i][1];
+              ringData[i * 4 + 2] = age;
+              ringData[i * 4 + 3] = age >= 0 && age < 6 ? 1 : 0;
+            }
+          }
+
+          function place(width, height, dpr) {
+            var fit = Math.max(width / photoW, height / photoH);
+            var shownW = photoW * fit;
+            var shownH = photoH * fit;
+            var left = (width - shownW) / 2;
+            var top = (height - shownH) / 2;
+            var x0 = Math.max(0, Math.floor(left + BOX[0] * shownW));
+            var y0 = Math.max(0, Math.floor(top + BOX[1] * shownH));
+            var x1 = Math.min(width, Math.ceil(left + BOX[2] * shownW));
+            var y1 = Math.min(height, Math.ceil(top + BOX[3] * shownH));
+            visible = x1 - x0 > 1 && y1 - y0 > 1;
+            if (!visible) return;
+            canvas.style.left = x0 + "px";
+            canvas.style.top = y0 + "px";
+            canvas.style.width = x1 - x0 + "px";
+            canvas.style.height = y1 - y0 + "px";
+            canvas.style.transformOrigin = width / 2 - x0 + "px " + (height / 2 - y0) + "px";
+            canvas.width = Math.round((x1 - x0) * dpr);
+            canvas.height = Math.round((y1 - y0) * dpr);
+            var u0 = (x0 - left) / shownW;
+            var u1 = (x1 - left) / shownW;
+            var v0 = (y0 - top) / shownH;
+            var v1 = (y1 - top) / shownH;
+            quad = new Float32Array([-1, -1, u0, v1, 1, -1, u1, v1, -1, 1, u0, v0, 1, 1, u1, v0]);
+            if (ready) gl.bufferData(gl.ARRAY_BUFFER, quad, gl.STATIC_DRAW);
+          }
+
+          function draw(time, glint) {
+            if (!ready || !visible) return false;
+            stir(time);
+            gl.viewport(0, 0, canvas.width, canvas.height);
+            gl.uniform1f(uTime, time);
+            gl.uniform1f(uGlint, glint);
+            gl.uniform4fv(uRings, ringData);
+            gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+            return true;
+          }
+
+          canvas.addEventListener("webglcontextlost", function (event) {
+            event.preventDefault();
+            ready = false;
+          });
+          canvas.addEventListener("webglcontextrestored", setup);
+          photo.onload = load;
+          mask.onload = function () {
+            findSpots();
+            load();
+          };
+          photo.src = "assets/background.jpg";
+          mask.src = "assets/lake-mask.png";
+
+          return { place: place, draw: draw };
         }
       })();
     </script>
