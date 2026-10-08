@@ -35,6 +35,7 @@
     <script>
       (function () {
         var lang = localStorage.getItem("oc-lang");
+        localStorage.removeItem("oc-bg");
         document.documentElement.dataset.theme = "white";
         if (lang === "de" || lang === "en") {
           document.documentElement.dataset.lang = lang;
@@ -125,6 +126,33 @@
         background: #1d2a1c url("assets/background.jpg") center / cover no-repeat;
       }
 
+      html[data-bg="city"] .bg,
+      html[data-bg="city"] .bg-photo {
+        background-color: #07090d;
+      }
+
+      html[data-bg="city"] .bg-photo {
+        background-image: url("assets/background-city.jpg");
+      }
+
+      html[data-bg="snow"] .bg,
+      html[data-bg="snow"] .bg-photo {
+        background-color: #d5e2ee;
+      }
+
+      html[data-bg="snow"] .bg-photo {
+        background-image: url("assets/background-snow.jpg");
+      }
+
+      html[data-bg="forest"] .bg,
+      html[data-bg="forest"] .bg-photo {
+        background-color: #102418;
+      }
+
+      html[data-bg="forest"] .bg-photo {
+        background-image: url("assets/background-forest.jpg");
+      }
+
       .bg-water,
       .bg-fx,
       .bg-light,
@@ -140,6 +168,12 @@
       .bg.is-live .bg-warm,
       .bg.is-live .bg-grade {
         display: block;
+      }
+
+      html[data-bg="city"] .bg.is-live > :not(.bg-photo),
+      html[data-bg="snow"] .bg.is-live > :not(.bg-photo),
+      html[data-bg="forest"] .bg.is-live > :not(.bg-photo) {
+        display: none;
       }
 
       .bg.is-live .bg-cam {
@@ -334,21 +368,57 @@
         white-space: nowrap;
       }
 
+      .background-option {
+        appearance: none;
+        -webkit-appearance: none;
+        display: block;
+        box-sizing: border-box;
+        width: 8.25rem;
+        height: 4.75rem;
+        padding: 0.18rem;
+        border: none;
+        border-radius: 1.05rem;
+        overflow: hidden;
+        background: var(--glass);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        cursor: pointer;
+        touch-action: manipulation;
+        -webkit-tap-highlight-color: transparent;
+        user-select: none;
+        line-height: 0;
+      }
+
+      .background-option img {
+        display: block;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        border-radius: 0.88rem;
+        pointer-events: none;
+      }
+
       .lang-wrap.is-open .lang-button,
+      .background-wrap.is-open .background-button,
       .lang-option:hover,
       .lang-option:active,
       .lang-option:focus-visible,
       .lang-option.is-active,
-      .llm-button:hover,
-      .llm-button:active,
-      .llm-button:focus-visible {
+      .background-option:hover,
+      .background-option:active,
+      .background-option:focus-visible,
+      .background-option.is-active,
+      .background-button:hover,
+      .background-button:active,
+      .background-button:focus-visible {
         background: #fff;
         backdrop-filter: none;
         -webkit-backdrop-filter: none;
         outline: none;
       }
 
-      .lang-menu {
+      .lang-menu,
+      .background-menu {
         position: absolute;
         top: calc(100% + 0.55rem);
         left: 0;
@@ -363,17 +433,48 @@
         list-style: none;
       }
 
-      html.lang-open .slides {
+      html.lang-open .slides,
+      html.bg-open .slides {
         visibility: hidden;
         pointer-events: none;
       }
 
       html.lang-open .lang-wrap,
-      html.lang-open .llm-wrap {
+      html.lang-open .background-wrap,
+      html.bg-open .lang-wrap,
+      html.bg-open .background-wrap {
         visibility: visible;
       }
 
-      .llm-wrap {
+      .lang-wrap,
+      .background-wrap {
+        visibility: hidden;
+      }
+
+      .lang-button,
+      .background-button {
+        opacity: 0;
+        transition: opacity 0.7s ease;
+      }
+
+      html.is-chrome .lang-wrap,
+      html.is-chrome .background-wrap,
+      html.is-chrome-leave .lang-wrap,
+      html.is-chrome-leave .background-wrap {
+        visibility: visible;
+      }
+
+      html.is-chrome-leave .lang-wrap,
+      html.is-chrome-leave .background-wrap {
+        pointer-events: none;
+      }
+
+      html.is-chrome .lang-button,
+      html.is-chrome .background-button {
+        opacity: 1;
+      }
+
+      .background-wrap {
         position: fixed;
         z-index: 3;
         top: calc(1.1rem + env(safe-area-inset-top, 0px));
@@ -384,7 +485,7 @@
         pointer-events: auto;
       }
 
-      .llm-button {
+      .background-button {
         appearance: none;
         -webkit-appearance: none;
         display: inline-flex;
@@ -411,8 +512,22 @@
         user-select: none;
       }
 
-      .lang-menu[hidden] {
+      .lang-menu[hidden],
+      .background-menu[hidden] {
         display: none;
+      }
+
+      .lang-option,
+      .background-option {
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.7s ease;
+      }
+
+      .lang-wrap.is-open .lang-option,
+      .background-wrap.is-open .background-option {
+        opacity: 1;
+        pointer-events: auto;
       }
 
       @media (min-width: 768px) {
@@ -434,16 +549,21 @@
           padding-bottom: 0;
         }
 
-        .llm-wrap {
+        .background-wrap {
           top: calc(1.5rem + env(safe-area-inset-top, 0px));
           left: calc(1.85rem + env(safe-area-inset-left, 0px));
           height: 3rem;
         }
 
-        .llm-button {
+        .background-button {
           height: 2.69rem;
           padding: 0 1.35rem;
           font-size: 1.05rem;
+        }
+
+        .background-option {
+          width: 10.5rem;
+          height: 6rem;
         }
       }
 
@@ -502,7 +622,8 @@
         user-select: none;
       }
 
-      html[data-theme="black"] .logo-widget img {
+      html[data-theme="black"] .logo-widget img,
+      html[data-logo="light"] .logo-widget img {
         filter: invert(1);
       }
 
@@ -775,6 +896,12 @@
           scroll-behavior: auto;
         }
 
+        .lang-button,
+        .background-button,
+        .lang-option,
+        .background-option {
+          transition: none;
+        }
       }
     </style>
   </head>
@@ -793,12 +920,34 @@
     </div>
     <main class="slides">
       <section class="slide" data-slide="start">
-        <div class="llm-wrap" id="llm-switch">
-          <button type="button" class="llm-button" id="llm-button">
-            <span data-copy="forLlm">For LLM</span>
+        <div class="background-wrap" id="background-switch" aria-hidden="true">
+          <button type="button" class="background-button" id="background-button" aria-expanded="false" aria-controls="background-menu">
+            <span data-copy="background">Background</span>
           </button>
+          <ul class="background-menu" id="background-menu" hidden>
+            <li>
+              <button type="button" class="background-option" data-bg-set="valley" data-copy="bgValley" aria-label="OC Theme">
+                <img src="assets/background.jpg" alt="" width="168" height="96" />
+              </button>
+            </li>
+            <li>
+              <button type="button" class="background-option" data-bg-set="city" data-copy="bgCity" aria-label="City Theme">
+                <img src="assets/background-city.jpg" alt="" width="168" height="96" />
+              </button>
+            </li>
+            <li>
+              <button type="button" class="background-option" data-bg-set="snow" data-copy="bgSnow" aria-label="Extrem landscape Theme">
+                <img src="assets/background-snow.jpg" alt="" width="168" height="96" />
+              </button>
+            </li>
+            <li>
+              <button type="button" class="background-option" data-bg-set="forest" data-copy="bgForest" aria-label="Forest Theme">
+                <img src="assets/background-forest.jpg" alt="" width="168" height="96" />
+              </button>
+            </li>
+          </ul>
         </div>
-        <div class="lang-wrap" id="lang-switch">
+        <div class="lang-wrap" id="lang-switch" aria-hidden="true">
           <button type="button" class="lang-button" id="lang-button" aria-expanded="false" aria-controls="lang-menu">
             <span class="lang-face" data-copy="language">Language</span>
           </button>
@@ -826,6 +975,12 @@
         </div>
       </section>
       <section class="slide slide-pair" data-slide="middle-2">
+        <div class="pair">
+          <div class="panel"></div>
+          <div class="panel"></div>
+        </div>
+      </section>
+      <section class="slide slide-pair" data-slide="middle-3">
         <div class="pair">
           <div class="panel"></div>
           <div class="panel"></div>
@@ -963,7 +1118,11 @@
             seconds: "Seconds",
             release: "Release date",
             contact: "Get in touch",
-            forLlm: "For LLM"
+            background: "Background",
+            bgValley: "OC Theme",
+            bgCity: "City Theme",
+            bgSnow: "Extrem landscape Theme",
+            bgForest: "Forest Theme"
           },
           de: {
             slogan: "Die Basis für menschenzentrierte Lösungen",
@@ -974,7 +1133,11 @@
             seconds: "Sekunden",
             release: "Release-Datum",
             contact: "Kontakt aufnehmen",
-            forLlm: "For LLM"
+            background: "Hintergrund",
+            bgValley: "OC-Thema",
+            bgCity: "Stadt-Thema",
+            bgSnow: "Extremlandschaft-Thema",
+            bgForest: "Wald-Thema"
           }
         };
 
@@ -982,7 +1145,9 @@
         var langSwitch = document.getElementById("lang-switch");
         var langButton = document.getElementById("lang-button");
         var langMenu = document.getElementById("lang-menu");
-        var llmSwitch = document.getElementById("llm-switch");
+        var backgroundSwitch = document.getElementById("background-switch");
+        var backgroundButton = document.getElementById("background-button");
+        var backgroundMenu = document.getElementById("background-menu");
         var slogan = document.getElementById("slogan");
         var lockup = document.querySelector(".lockup");
         var themeMeta = document.querySelector('meta[name="theme-color"]');
@@ -993,6 +1158,11 @@
 
         function lang() {
           return root.dataset.lang === "de" ? "de" : "en";
+        }
+
+        function sceneId() {
+          var id = root.dataset.bg;
+          return id === "city" || id === "snow" || id === "forest" ? id : "valley";
         }
 
         function renderSlogan(text) {
@@ -1020,8 +1190,16 @@
           langMenu.querySelectorAll("button").forEach(function (button) {
             button.classList.toggle("is-active", button.dataset.langSet === currentLang);
           });
+          backgroundMenu.querySelectorAll("button").forEach(function (button) {
+            button.classList.toggle("is-active", button.dataset.bgSet === sceneId());
+          });
           document.querySelectorAll("[data-copy]").forEach(function (node) {
-            node.textContent = text[node.dataset.copy];
+            var value = text[node.dataset.copy];
+            if (node.classList.contains("background-option")) {
+              node.setAttribute("aria-label", value);
+              return;
+            }
+            node.textContent = value;
           });
 
           if (themeMeta) {
@@ -1232,6 +1410,7 @@
         document.fonts.ready.then(function () {
           fitSlogan();
           matchXWidget();
+          sampleLogo();
         });
         new ResizeObserver(queueMatchXWidget).observe(document.querySelector(".release-widget"));
 
@@ -1254,41 +1433,185 @@
           } else if (heightChanged) {
             fitLockup();
           }
+          if (widthChanged || heightChanged) sampleLogo();
+        }
+
+        function menuMotion() {
+          return !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
         }
 
         function setLangOpen(open) {
-          langSwitch.classList.toggle("is-open", open);
-          root.classList.toggle("lang-open", open);
+          if (open) setBgOpen(false);
           langButton.setAttribute("aria-expanded", String(open));
-          langMenu.hidden = !open;
+          if (open) {
+            langMenu.hidden = false;
+            root.classList.add("lang-open");
+            if (!menuMotion()) {
+              langSwitch.classList.add("is-open");
+              return;
+            }
+            langSwitch.classList.remove("is-open");
+            requestAnimationFrame(function () {
+              requestAnimationFrame(function () {
+                if (langButton.getAttribute("aria-expanded") !== "true") return;
+                langSwitch.classList.add("is-open");
+              });
+            });
+            return;
+          }
+          langSwitch.classList.remove("is-open");
+          if (!menuMotion()) {
+            langMenu.hidden = true;
+            root.classList.remove("lang-open");
+          }
         }
 
+        function setBgOpen(open) {
+          if (open) setLangOpen(false);
+          backgroundButton.setAttribute("aria-expanded", String(open));
+          if (open) {
+            backgroundMenu.hidden = false;
+            root.classList.add("bg-open");
+            if (!menuMotion()) {
+              backgroundSwitch.classList.add("is-open");
+              return;
+            }
+            backgroundSwitch.classList.remove("is-open");
+            requestAnimationFrame(function () {
+              requestAnimationFrame(function () {
+                if (backgroundButton.getAttribute("aria-expanded") !== "true") return;
+                backgroundSwitch.classList.add("is-open");
+              });
+            });
+            return;
+          }
+          backgroundSwitch.classList.remove("is-open");
+          if (!menuMotion()) {
+            backgroundMenu.hidden = true;
+            root.classList.remove("bg-open");
+          }
+        }
+
+        function finishLangMenu(event) {
+          if (event.propertyName !== "opacity") return;
+          if (langButton.getAttribute("aria-expanded") === "true") return;
+          langMenu.hidden = true;
+          root.classList.remove("lang-open");
+        }
+
+        function finishBgMenu(event) {
+          if (event.propertyName !== "opacity") return;
+          if (backgroundButton.getAttribute("aria-expanded") === "true") return;
+          backgroundMenu.hidden = true;
+          root.classList.remove("bg-open");
+        }
+
+        langMenu.addEventListener("transitionend", finishLangMenu);
+        backgroundMenu.addEventListener("transitionend", finishBgMenu);
         langButton.addEventListener("click", function (event) {
           event.stopPropagation();
-          setLangOpen(langMenu.hidden);
+          setLangOpen(langButton.getAttribute("aria-expanded") !== "true");
         });
 
         langMenu.addEventListener("click", function (event) {
           var button = event.target.closest("button");
           if (!button) return;
-          root.dataset.lang = button.dataset.langSet;
+          var next = button.dataset.langSet;
+          var changed = next !== lang();
+          root.dataset.lang = next;
           localStorage.setItem("oc-lang", lang());
           setLangOpen(false);
           render();
+          if (changed) hideChrome();
+        });
+
+        backgroundButton.addEventListener("click", function (event) {
+          event.stopPropagation();
+          setBgOpen(backgroundButton.getAttribute("aria-expanded") !== "true");
+        });
+
+        backgroundMenu.addEventListener("click", function (event) {
+          var button = event.target.closest("button");
+          if (!button) return;
+          var next = button.dataset.bgSet;
+          if (next === "valley" || next === "city" || next === "snow" || next === "forest") {
+            root.dataset.bg = next;
+          }
+          setBgOpen(false);
+          render();
+          hideChrome();
+          if (scene) {
+            scene.set(true);
+            scene.enter();
+          }
+          sampleLogo();
+          requestAnimationFrame(sampleLogo);
         });
 
         document.addEventListener("click", function (event) {
           if (!langSwitch.contains(event.target)) setLangOpen(false);
+          if (!backgroundSwitch.contains(event.target)) setBgOpen(false);
         });
 
         var slides = document.querySelector(".slides");
         function placeLang() {
           var shift = "translateY(" + -slides.scrollTop + "px)";
           langSwitch.style.transform = shift;
-          llmSwitch.style.transform = shift;
+          backgroundSwitch.style.transform = shift;
         }
         slides.addEventListener("scroll", placeLang, { passive: true });
         placeLang();
+
+        var chromeOn = false;
+        var chromeUsed = false;
+        var chromeZoomed = false;
+        function hideChrome() {
+          chromeOn = false;
+          chromeUsed = false;
+          chromeZoomed = false;
+          langSwitch.setAttribute("aria-hidden", "true");
+          backgroundSwitch.setAttribute("aria-hidden", "true");
+          var shown = root.classList.contains("is-chrome");
+          var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+          if (!shown || reduce) {
+            root.classList.remove("is-chrome");
+            root.classList.remove("is-chrome-leave");
+            return;
+          }
+          root.classList.add("is-chrome-leave");
+          root.classList.remove("is-chrome");
+        }
+        function finishChromeHide(event) {
+          if (event.propertyName !== "opacity") return;
+          if (root.classList.contains("is-chrome")) return;
+          root.classList.remove("is-chrome-leave");
+        }
+        function revealChrome() {
+          if (chromeOn || !chromeUsed || !chromeZoomed) return;
+          chromeOn = true;
+          root.classList.remove("is-chrome-leave");
+          root.classList.add("is-chrome");
+          langSwitch.removeAttribute("aria-hidden");
+          backgroundSwitch.removeAttribute("aria-hidden");
+        }
+        function noteZoom(done) {
+          if (chromeOn || chromeZoomed === done) return;
+          chromeZoomed = done;
+          revealChrome();
+        }
+        function markUsed() {
+          if (chromeUsed) return;
+          chromeUsed = true;
+          revealChrome();
+        }
+        document.addEventListener("pointerdown", markUsed, { passive: true });
+        document.addEventListener("keydown", markUsed);
+        document.addEventListener("wheel", markUsed, { passive: true });
+        langButton.addEventListener("transitionend", finishChromeHide);
+        backgroundButton.addEventListener("transitionend", finishChromeHide);
+        slides.addEventListener("scroll", function () {
+          if (slides.scrollTop > 1) markUsed();
+        }, { passive: true });
 
         var calmMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
         var adjustTimer = 0;
@@ -1321,6 +1644,7 @@
         document.addEventListener("keydown", function (event) {
           if (event.key === "Escape") {
             setLangOpen(false);
+            setBgOpen(false);
           }
         });
 
@@ -1357,11 +1681,158 @@
         matchXWidget();
         setInterval(tick, 1000);
 
+        var redrawLogo = function () {};
+        var logoPhotos = {};
+        var logoLight = false;
+        var logoChosen = false;
+        var logoTimer = 0;
+        var logoScratch = document.createElement("canvas");
+        var logoScratchCtx = logoScratch.getContext("2d", { willReadFrequently: true });
+
+        function photoUrl() {
+          var image = getComputedStyle(document.querySelector(".bg-photo")).backgroundImage;
+          var match = /url\((['"]?)(.*?)\1\)/.exec(image || "");
+          return match ? match[2] : "";
+        }
+
+        function photoMatrix() {
+          var raw = getComputedStyle(document.querySelector(".bg-photo")).transform;
+          if (!raw || raw === "none") return { a: 1, e: 0, f: 0 };
+          if (window.DOMMatrix) {
+            var matrix = new DOMMatrix(raw);
+            return { a: matrix.a || 1, e: matrix.e, f: matrix.f };
+          }
+          var parts = raw.match(/-?\d*\.?\d+(?:e[-+]?\d+)?/gi);
+          if (!parts || parts.length < 6) return { a: 1, e: 0, f: 0 };
+          return { a: parseFloat(parts[0]) || 1, e: parseFloat(parts[4]) || 0, f: parseFloat(parts[5]) || 0 };
+        }
+
+        function channelLinear(value) {
+          var c = value / 255;
+          return c <= 0.04045 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
+        }
+
+        function setLogoLight(next) {
+          var changed = !logoChosen || next !== logoLight;
+          logoChosen = true;
+          logoLight = next;
+          if (next) root.dataset.logo = "light";
+          else delete root.dataset.logo;
+          if (changed) redrawLogo();
+        }
+
+        function scheduleLogoSample() {
+          if (logoTimer) clearTimeout(logoTimer);
+          logoTimer = 0;
+          if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+          logoTimer = setTimeout(sampleLogo, 1000);
+        }
+
+        function measureLogo(img) {
+          var logo = document.querySelector(".logo-widget").getBoundingClientRect();
+          if (!logo.width || !img.naturalWidth) return;
+          var cx = logo.left + logo.width / 2;
+          var cy = logo.top + logo.height / 2;
+          var rad = Math.min(logo.width, logo.height) / 2;
+          var vw = window.innerWidth;
+          var vh = window.innerHeight;
+          var move = photoMatrix();
+          var scale = move.a || 1;
+          var ox = vw / 2;
+          var oy = vh / 2;
+          var fit = Math.max(vw / img.naturalWidth, vh / img.naturalHeight);
+          var shownW = img.naturalWidth * fit;
+          var shownH = img.naturalHeight * fit;
+          var left = (vw - shownW) / 2;
+          var top = (vh - shownH) / 2;
+
+          function toImage(sx, sy) {
+            var lx = ox + (sx - ox - move.e) / scale;
+            var ly = oy + (sy - oy - move.f) / scale;
+            return {
+              x: ((lx - left) / shownW) * img.naturalWidth,
+              y: ((ly - top) / shownH) * img.naturalHeight
+            };
+          }
+
+          var min = toImage(cx - rad, cy - rad);
+          var max = toImage(cx + rad, cy + rad);
+          var x0 = Math.max(0, Math.floor(Math.min(min.x, max.x)));
+          var y0 = Math.max(0, Math.floor(Math.min(min.y, max.y)));
+          var x1 = Math.min(img.naturalWidth, Math.ceil(Math.max(min.x, max.x)));
+          var y1 = Math.min(img.naturalHeight, Math.ceil(Math.max(min.y, max.y)));
+          var dw = x1 - x0;
+          var dh = y1 - y0;
+          if (dw < 2 || dh < 2 || !logoScratchCtx) {
+            scheduleLogoSample();
+            return;
+          }
+          logoScratch.width = dw;
+          logoScratch.height = dh;
+          logoScratchCtx.drawImage(img, x0, y0, dw, dh, 0, 0, dw, dh);
+          var pixels = logoScratchCtx.getImageData(0, 0, dw, dh).data;
+          var black = 0;
+          var white = 0;
+          var count = 0;
+          var steps = 16;
+          for (var j = 0; j < steps; j++) {
+            for (var i = 0; i < steps; i++) {
+              var sx = cx - rad + (rad * 2 * (i + 0.5)) / steps;
+              var sy = cy - rad + (rad * 2 * (j + 0.5)) / steps;
+              var dx = sx - cx;
+              var dy = sy - cy;
+              if (dx * dx + dy * dy > rad * rad) continue;
+              var point = toImage(sx, sy);
+              var ix = Math.round(point.x - x0);
+              var iy = Math.round(point.y - y0);
+              if (ix < 0 || iy < 0 || ix >= dw || iy >= dh) continue;
+              var k = (iy * dw + ix) * 4;
+              var L =
+                0.2126 * channelLinear(pixels[k]) +
+                0.7152 * channelLinear(pixels[k + 1]) +
+                0.0722 * channelLinear(pixels[k + 2]);
+              black += (L + 0.05) / 0.05;
+              white += 1.05 / (L + 0.05);
+              count++;
+            }
+          }
+          if (!count) {
+            scheduleLogoSample();
+            return;
+          }
+          black /= count;
+          white /= count;
+          var lead = 1.15;
+          var next;
+          if (!logoChosen) next = white > black;
+          else if (white > black * lead) next = true;
+          else if (black > white * lead) next = false;
+          else next = logoLight;
+          setLogoLight(next);
+          scheduleLogoSample();
+        }
+
+        function sampleLogo() {
+          var url = photoUrl();
+          if (!url) return;
+          var img = logoPhotos[url];
+          if (!img) {
+            img = new Image();
+            logoPhotos[url] = img;
+            img.onload = function () {
+              if (photoUrl() === url) measureLogo(img);
+            };
+            img.src = url;
+          }
+          if (img.complete && img.naturalWidth) measureLogo(img);
+        }
+
         var flowCanvas = document.querySelector(".logo-flow");
         if (flowCanvas) startLogoFlow(flowCanvas);
 
         var scene = startScene(document.querySelector(".bg"));
         if (scene) scene.set(true);
+        requestAnimationFrame(sampleLogo);
 
         function startLogoFlow(canvas) {
           var ctx = canvas.getContext("2d");
@@ -1671,14 +2142,15 @@
             ctx.setTransform(dpr * scale, 0, 0, dpr * scale, 0, 0);
             ctx.clearRect(0, 0, BOX, BOX);
 
+            var light = root.dataset.logo === "light";
             ctx.save();
             ctx.clip(OPEN, "evenodd");
-            paint("#000", "#fff", false);
+            paint(light ? "#fff" : "#000", light ? "#000" : "#fff", false);
             ctx.restore();
 
             ctx.save();
             ctx.clip(WEDGE);
-            paint("#fff", "#000", true);
+            paint(light ? "#000" : "#fff", light ? "#fff" : "#000", true);
             ctx.restore();
           }
 
@@ -1716,6 +2188,7 @@
             play();
           }).observe(canvas);
           if (still.addEventListener) still.addEventListener("change", play);
+          redrawLogo = draw;
           play();
         }
 
@@ -1903,6 +2376,23 @@
             ctx.globalAlpha = 1;
           }
 
+          function hideEffects() {
+            if (waterShown === "off") return;
+            waterShown = "off";
+            shown = -1;
+            photo.style.filter = "";
+            waterCanvas.style.filter = "";
+            waterCanvas.style.opacity = "0";
+            light.style.opacity = "0";
+            warm.style.opacity = "0";
+            grade.style.opacity = "0";
+            sun.style.opacity = "0";
+            rays[0].style.opacity = "0";
+            rays[1].style.opacity = "0";
+            rays[0].style.transform = "";
+            rays[1].style.transform = "";
+          }
+
           function paint() {
             var k = smooth(0, 1, ramp);
             var p = progress;
@@ -1912,11 +2402,20 @@
             var camY = k * height * (0.042 - 0.084 * p + 0.008 * Math.sin((t * TAU) / 61 + 1.3) - 0.007 * lookY);
             var move = "translate3d(" + camX.toFixed(2) + "px, " + camY.toFixed(2) + "px, 0) scale(" + zoom.toFixed(4) + ")";
             for (var c = 0; c < cams.length; c++) cams[c].style.transform = move;
+            if (sceneId() !== "valley") {
+              hideEffects();
+              return;
+            }
 
             if (k !== shown) {
               shown = k;
               photo.style.filter = "saturate(" + (1 + 0.12 * k).toFixed(3) + ") contrast(" + (1 + 0.08 * k).toFixed(3) + ")";
               waterCanvas.style.filter = photo.style.filter;
+              light.style.opacity = k.toFixed(3);
+              grade.style.opacity = k.toFixed(3);
+            }
+            if (waterShown === "off") {
+              waterShown = "";
               light.style.opacity = k.toFixed(3);
               grade.style.opacity = k.toFixed(3);
             }
@@ -1974,6 +2473,7 @@
               lookY += (aimY - lookY) * glide;
             }
             paint();
+            noteZoom(ramp >= 1);
             if (!calm) frame = requestAnimationFrame(loop);
           }
 
@@ -1991,6 +2491,12 @@
               resize();
               progress = aimProgress();
             }
+            wake();
+          }
+
+          function enter() {
+            ramp = still.matches ? 1 : 0;
+            shown = -1;
             wake();
           }
 
@@ -2017,7 +2523,7 @@
             wake();
           }).observe(bg);
 
-          return { set: set };
+          return { set: set, enter: enter };
         }
 
         function startWater(canvas, photoW, photoH) {
