@@ -74,16 +74,23 @@
       :root {
         --widget: #fff;
         --ink: #111;
+        --edge: #111;
         --glass: rgba(255, 255, 255, 0.48);
         --shadow: 0 10px 28px rgba(0, 0, 0, 0.18);
         --sans: "Inter", sans-serif;
         --app-height: 100dvh;
+        --panel-ms: 0.85s;
+        --panel-ease: cubic-bezier(0.4, 0, 0.2, 1);
       }
 
       html[data-theme="black"] {
         --widget: #111;
         --ink: #fff;
         --shadow: 0 10px 28px rgba(0, 0, 0, 0.35);
+      }
+
+      html[data-logo="light"] {
+        --edge: #fff;
       }
 
       * {
@@ -658,44 +665,128 @@
         height: var(--app-height);
         padding:
           calc(1.5rem + env(safe-area-inset-top, 0px))
-          calc(1.5rem + env(safe-area-inset-right, 0px))
+          0
           calc(1.5rem + env(safe-area-inset-bottom, 0px))
-          calc(1.5rem + env(safe-area-inset-left, 0px));
+          0;
         container-type: size;
+        transition: padding var(--panel-ms) var(--panel-ease);
       }
 
       .pair {
+        --s: min(calc(100cqh - 3rem), calc((100cqw - max(7.5rem, 18cqw)) / 2));
+        --g: calc((100cqw - 2 * var(--s)) / 3);
         position: relative;
         z-index: 1;
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 1.25rem;
-        width: fit-content;
-        max-width: 100%;
-        justify-items: center;
+        align-self: stretch;
+        width: 100%;
+        height: 100%;
       }
 
       .panel {
-        width: min(
-          100cqh,
-          calc((100cqw - 1.25rem) / 2),
-          max(50cqh, 20rem, calc((56cqw - 1.25rem) / 2))
-        );
+        position: absolute;
+        width: var(--s);
         aspect-ratio: 1;
+        top: calc(50% - var(--s) / 2);
+        left: var(--g);
         background: var(--glass);
         backdrop-filter: blur(12px);
         -webkit-backdrop-filter: blur(12px);
-        border: 2px solid var(--ink);
+        border: 2px solid var(--edge);
         border-radius: 1.5rem;
+        transition:
+          width var(--panel-ms) var(--panel-ease),
+          left var(--panel-ms) var(--panel-ease),
+          top var(--panel-ms) var(--panel-ease);
       }
 
-      @container (max-width: calc(100dvh - 1.75rem)) {
-        .pair {
-          grid-template-columns: 1fr;
+      .panel:last-child {
+        left: calc(100% - var(--g) - var(--s));
+      }
+
+      .panel-copy {
+        display: flex;
+        flex-direction: column;
+        box-sizing: border-box;
+        padding: 7%;
+        color: #111;
+        text-align: left;
+        container-type: size;
+      }
+
+      .panel-title {
+        margin: 0 0 0.55em;
+        font-size: 6.6cqw;
+        font-weight: 700;
+        line-height: 1.15;
+      }
+
+      .panel-text {
+        flex: 1;
+        margin: 0;
+        overflow: auto;
+        font-size: 4.15cqw;
+        font-weight: 500;
+        line-height: 1.35;
+      }
+
+      .panel-pages {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.4rem;
+        margin-top: 0.7em;
+        font-size: 3.8cqw;
+        font-weight: 600;
+      }
+
+      .panel-step {
+        appearance: none;
+        border: none;
+        background: transparent;
+        color: inherit;
+        font: inherit;
+        line-height: 1;
+        padding: 0.25em 0.45em;
+        cursor: pointer;
+      }
+
+      .panel-step:disabled {
+        opacity: 0.35;
+        cursor: default;
+      }
+
+      @media (max-width: calc(100dvh - 1.75rem)) {
+        .slide-pair {
+          padding-top: 0;
+          padding-bottom: 0;
+          padding-left: calc(1.5rem + env(safe-area-inset-left, 0px));
+          padding-right: calc(1.5rem + env(safe-area-inset-right, 0px));
         }
 
-        .panel {
-          width: min(100cqw, calc((100cqh - 1.25rem) / 2));
+        .pair {
+          --s: min(78cqw, calc((100cqh - max(7.5rem, 18cqh)) / 2));
+          --g: calc((100cqh - 2 * var(--s)) / 3);
+        }
+
+        .panel,
+        .panel:last-child {
+          left: calc(50% - var(--s) / 2);
+          top: var(--g);
+        }
+
+        .panel:last-child {
+          top: calc(100% - var(--g) - var(--s));
+        }
+      }
+
+      @media (max-width: 480px) and (min-height: 760px) {
+        .slide-pair {
+          padding-left: calc(0.75rem + env(safe-area-inset-left, 0px));
+          padding-right: calc(0.75rem + env(safe-area-inset-right, 0px));
+        }
+
+        .pair {
+          --s: min(100cqw, calc((100cqh - 3.75rem) / 2));
         }
       }
 
@@ -716,21 +807,20 @@
         position: relative;
         z-index: 1;
         display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 1.25rem;
         max-width: 100%;
       }
 
       .end-board {
-        position: absolute;
-        top: calc(100% + 1.25rem);
-        left: 50%;
-        transform: translateX(-50%);
         display: flex;
         flex-wrap: wrap;
         justify-content: center;
         align-items: flex-start;
         gap: 1.25rem;
         width: max-content;
-        max-width: calc(100vw - 3rem);
+        max-width: 100%;
       }
 
       .end-widget {
@@ -740,7 +830,7 @@
         min-width: 0;
         background: var(--glass);
         color: #111;
-        border: 1px solid #111;
+        border: 1px solid var(--edge);
         border-radius: 0.65rem;
         backdrop-filter: blur(12px);
         -webkit-backdrop-filter: blur(12px);
@@ -859,6 +949,21 @@
         .end-widget {
           border-radius: 0.8rem;
         }
+
+        .end-kicker {
+          font-size: clamp(0.99rem, 1.65vw, 1.265rem);
+        }
+
+        .end-date,
+        .x-line {
+          font-size: clamp(1.87rem, 3.3vw, 2.97rem);
+        }
+
+        .release-widget,
+        .x-widget {
+          gap: 0.605rem;
+          padding: 0.495rem 0.77rem;
+        }
       }
 
       @media (max-width: 640px) {
@@ -891,6 +996,11 @@
         }
       }
 
+      html.is-resizing .panel,
+      html.is-resizing .slide-pair {
+        transition: none;
+      }
+
       @media (prefers-reduced-motion: reduce) {
         .slides {
           scroll-behavior: auto;
@@ -899,7 +1009,9 @@
         .lang-button,
         .background-button,
         .lang-option,
-        .background-option {
+        .background-option,
+        .panel,
+        .slide-pair {
           transition: none;
         }
       }
@@ -962,7 +1074,28 @@
         </div>
         <div class="lockup">
           <div class="logo-widget">
-            <canvas class="logo-flow" aria-hidden="true"></canvas>
+            <svg class="logo-flow" viewBox="0 0 1024 1024" aria-hidden="true">
+              <defs>
+                <clipPath id="logo-wedge" clipPathUnits="userSpaceOnUse">
+                  <path d="M 873.961 150.039 A 511.89 511.89 0 0 1 873.961 873.961 L 640.743 640.743 A 182.07 182.07 0 0 0 640.743 383.257 Z" />
+                </clipPath>
+                <clipPath id="logo-open" clipPathUnits="userSpaceOnUse">
+                  <path clip-rule="evenodd" d="M 0 0 H 1024 V 1024 H 0 Z M 873.961 150.039 A 511.89 511.89 0 0 1 873.961 873.961 L 640.743 640.743 A 182.07 182.07 0 0 0 640.743 383.257 Z" />
+                </clipPath>
+              </defs>
+              <g id="logo-open-ink" clip-path="url(#logo-open)">
+                <g data-kind="line"></g>
+                <g data-kind="dot"></g>
+                <g data-kind="rim"></g>
+                <g data-kind="spark"></g>
+              </g>
+              <g id="logo-wedge-ink" clip-path="url(#logo-wedge)">
+                <g data-kind="line"></g>
+                <g data-kind="dot"></g>
+                <g data-kind="rim"></g>
+                <g data-kind="spark"></g>
+              </g>
+            </svg>
             <img src="assets/logo.svg" alt="OC" width="160" height="160" />
           </div>
           <p class="slogan" id="slogan">The <span class="slogan-mark">Basis</span> for human-centric solutions</p>
@@ -970,19 +1103,43 @@
       </section>
       <section class="slide slide-pair" data-slide="middle-1">
         <div class="pair">
-          <div class="panel"></div>
+          <div class="panel panel-copy" data-mission="0">
+            <h2 class="panel-title"></h2>
+            <p class="panel-text"></p>
+            <div class="panel-pages">
+              <button type="button" class="panel-step" data-dir="-1" aria-label="Previous">‹</button>
+              <span class="panel-count"></span>
+              <button type="button" class="panel-step" data-dir="1" aria-label="Next">›</button>
+            </div>
+          </div>
           <div class="panel"></div>
         </div>
       </section>
       <section class="slide slide-pair" data-slide="middle-2">
         <div class="pair">
-          <div class="panel"></div>
+          <div class="panel panel-copy" data-mission="1">
+            <h2 class="panel-title"></h2>
+            <p class="panel-text"></p>
+            <div class="panel-pages">
+              <button type="button" class="panel-step" data-dir="-1" aria-label="Previous">‹</button>
+              <span class="panel-count"></span>
+              <button type="button" class="panel-step" data-dir="1" aria-label="Next">›</button>
+            </div>
+          </div>
           <div class="panel"></div>
         </div>
       </section>
       <section class="slide slide-pair" data-slide="middle-3">
         <div class="pair">
-          <div class="panel"></div>
+          <div class="panel panel-copy" data-mission="2">
+            <h2 class="panel-title"></h2>
+            <p class="panel-text"></p>
+            <div class="panel-pages">
+              <button type="button" class="panel-step" data-dir="-1" aria-label="Previous">‹</button>
+              <span class="panel-count"></span>
+              <button type="button" class="panel-step" data-dir="1" aria-label="Next">›</button>
+            </div>
+          </div>
           <div class="panel"></div>
         </div>
       </section>
@@ -1122,7 +1279,9 @@
             bgValley: "OC Theme",
             bgCity: "City Theme",
             bgSnow: "Extrem landscape Theme",
-            bgForest: "Forest Theme"
+            bgForest: "Forest Theme",
+            pagePrev: "Previous",
+            pageNext: "Next"
           },
           de: {
             slogan: "Die Basis für menschenzentrierte Lösungen",
@@ -1137,7 +1296,9 @@
             bgValley: "OC-Thema",
             bgCity: "Stadt-Thema",
             bgSnow: "Extremlandschaft-Thema",
-            bgForest: "Wald-Thema"
+            bgForest: "Wald-Thema",
+            pagePrev: "Zurück",
+            pageNext: "Weiter"
           }
         };
 
@@ -1180,6 +1341,67 @@
           });
         }
 
+        var mission = [
+          {
+            title: "Intelligence shapes the universe",
+            paragraphs: [
+              "Alles, was in unserem Universum denken und lernen kann, folgt denselben Naturgesetzen. Trotzdem ist keine Intelligenz wie die andere, denn jede passt sich an ihre eigene Umgebung an.",
+              "Von Intelligenz sprechen wir, wenn etwas Muster in seiner Umgebung erkennt, sich daraus ein eigenes Bild der Welt macht und danach handelt. Sobald das passiert, entsteht eine eigene Realität: die Welt, so wie diese Intelligenz sie sieht.",
+              "Was eine Intelligenz schon verstanden hat, ist für sie normal und vorhersehbar. Alles Neue ist erst einmal ein Rätsel, bis sie es verstanden hat. Lernen heißt also: Rätsel in Verständnis verwandeln.",
+              "Was eine Intelligenz verstanden hat, kann sie auch nutzen. Und weil sich viele Intelligenzen dieselbe Umgebung teilen, beeinflussen sie sich gegenseitig, vor allem dann, wenn sie ungefähr gleich viel wissen.",
+              "Weiß eine Intelligenz deutlich mehr als die anderen um sie herum, kann sie deren Umgebung mitgestalten und damit auch die anderen beeinflussen. So stapeln sich Intelligenzen übereinander: Wer mehr versteht, steht weiter oben.",
+              "Kurz gesagt: Das Universum besteht aus festen Naturgesetzen und aus Intelligenzen, die diese Gesetze nach und nach verstehen. Je mehr eine Intelligenz versteht, desto mehr kann sie ihre Umgebung gestalten und damit auch die Realität anderer. Die Physik bleibt dabei immer die Grundlage, aber innerhalb davon setzt jede Intelligenz ihre eigenen Regeln."
+            ]
+          },
+          {
+            title: "Human intelligence should shape the universe",
+            paragraphs: [
+              "Für uns ist eine Intelligenz besonders wichtig: die menschliche. Menschen lernen voneinander, bauen aufeinander auf, beeinflussen sich und kontrollieren sich auch gegenseitig.",
+              "Inzwischen gibt es aber auch eine Intelligenz, die nicht menschlich ist und trotzdem mitten unter uns lebt: die künstliche Intelligenz. Ihre Umgebung ist die Welt, die wir Menschen für sie gebaut haben.",
+              "Unser Ziel sollte sein, dass jeder Mensch die bestmögliche Realität bekommt. Dafür sollten wir uns weniger gegenseitig beeinflussen und mehr unserer eigenen Wahrnehmung folgen. Was jeder Einzelne sieht und denkt, sollte möglichst direkt in die gemeinsame Intelligenz aller Menschen einfließen.",
+              "Jeder Mensch sollte so viel Einfluss wie möglich auf seine eigene Realität haben, damit er das Leben führen kann, das für ihn am besten ist. Und das auch auf lange Sicht: Die Menschheit soll so lange wie möglich existieren, damit möglichst viele Menschen ein erfülltes Leben haben können."
+            ]
+          },
+          {
+            title: "OC brings human intelligence to the fundamentals",
+            paragraphs: [
+              "Damit jeder Mensch das bestmögliche Leben führen kann, braucht es ein System, in dem jeder die gleiche Stimme hat: Jeder formt seine Sicht auf die Welt selbst, gleichberechtigt mit allen anderen und möglichst ohne fremde Beeinflussung. So kann jeder frei seinen eigenen Weg zur Erkenntnis gehen. Zusammen ergibt das ein großes Ganzes, das bündelt, wie die Menschen die Welt sehen und was sie sich wünschen. Künstliche Intelligenz sollte darunter stehen und diese Wünsche bestmöglich in der Realität umsetzen.",
+              "Genau dieses System soll OC verkörpern: OC wird die Schnittstelle, die die Sichtweisen und Meinungen aller Menschen sammelt und zu einem gemeinsamen Bild zusammenführt. Daraus entsteht ein klarer Auftrag, mit dem die Realität so gestaltet wird, wie die Menschen es sich wünschen."
+            ]
+          }
+        ];
+        var missionPage = [0, 0, 0];
+
+        function showMission() {
+          var labels = copy[lang()];
+          document.querySelectorAll(".panel-copy").forEach(function (panel) {
+            var index = Number(panel.dataset.mission);
+            var chapter = mission[index];
+            var page = missionPage[index];
+            panel.querySelector(".panel-title").textContent = chapter.title;
+            panel.querySelector(".panel-text").textContent = chapter.paragraphs[page];
+            panel.querySelector(".panel-count").textContent = (page + 1) + " / " + chapter.paragraphs.length;
+            var prev = panel.querySelector("[data-dir='-1']");
+            var next = panel.querySelector("[data-dir='1']");
+            prev.disabled = page === 0;
+            next.disabled = page === chapter.paragraphs.length - 1;
+            prev.setAttribute("aria-label", labels.pagePrev);
+            next.setAttribute("aria-label", labels.pageNext);
+          });
+        }
+
+        document.querySelector(".slides").addEventListener("click", function (event) {
+          var button = event.target.closest(".panel-step");
+          if (!button || button.disabled) return;
+          var panel = button.closest(".panel-copy");
+          var index = Number(panel.dataset.mission);
+          var page = missionPage[index] + Number(button.dataset.dir);
+          var chapter = mission[index];
+          if (page < 0 || page >= chapter.paragraphs.length) return;
+          missionPage[index] = page;
+          showMission();
+        });
+
         function render() {
           var currentTheme = theme();
           var currentLang = lang();
@@ -1208,6 +1430,7 @@
 
           fitSlogan();
           matchXWidget();
+          showMission();
         }
 
         function setPx(node, prop, value) {
@@ -1562,6 +1785,89 @@
         slides.addEventListener("scroll", placeLang, { passive: true });
         placeLang();
 
+        (function watchPanelSwitch() {
+          var query = window.matchMedia("(max-width: calc(100dvh - 1.75rem))");
+          var stacked = query.matches;
+          var panels = [].slice.call(document.querySelectorAll(".slide-pair .panel"));
+          function remember() {
+            if (root.classList.contains("is-resizing")) return;
+            panels.forEach(function (panel) {
+              if (panel.style.transform || panel._moving) return;
+              var slide = panel.closest(".slide");
+              var sr = slide.getBoundingClientRect();
+              var rect = panel.getBoundingClientRect();
+              if (!sr.width || !sr.height) return;
+              panel._spot = {
+                x: (rect.left - sr.left) / sr.width,
+                y: (rect.top - sr.top) / sr.height,
+                s: rect.width / Math.min(sr.width, sr.height)
+              };
+            });
+          }
+          function frame() {
+            remember();
+            requestAnimationFrame(frame);
+          }
+          requestAnimationFrame(frame);
+          query.addEventListener("change", function () {
+            if (query.matches === stacked) return;
+            stacked = query.matches;
+            if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+            var spots = panels.map(function (panel) { return panel._spot; });
+            root.classList.add("is-resizing");
+            requestAnimationFrame(function () {
+              panels.forEach(function (panel, index) {
+                var spot = spots[index];
+                var slide = panel.closest(".slide");
+                var sr = slide.getBoundingClientRect();
+                var rect = panel.getBoundingClientRect();
+                if (!spot || !sr.width || !sr.height) return;
+                var dx = spot.x * sr.width - (rect.left - sr.left);
+                var dy = spot.y * sr.height - (rect.top - sr.top);
+                var startSize = (spot.s || rect.width / Math.min(sr.width, sr.height)) * Math.min(sr.width, sr.height);
+                var grow = Math.max(0.4, Math.min(2.5, startSize / rect.width));
+                var pad = 8;
+                var visualLeft = rect.left - sr.left + dx;
+                var visualTop = rect.top - sr.top + dy;
+                var visualW = rect.width * grow;
+                var visualH = rect.height * grow;
+                if (visualLeft < pad) dx += pad - visualLeft;
+                if (visualLeft + visualW > sr.width - pad) dx -= visualLeft + visualW - (sr.width - pad);
+                if (visualTop < pad) dy += pad - visualTop;
+                if (visualTop + visualH > sr.height - pad) dy -= visualTop + visualH - (sr.height - pad);
+                panel.style.transition = "none";
+                panel.style.transformOrigin = "0 0";
+                panel.style.transform =
+                  "translate(" + dx.toFixed(2) + "px," + dy.toFixed(2) + "px) scale(" + grow.toFixed(4) + ")";
+              });
+              requestAnimationFrame(function () {
+                root.classList.remove("is-resizing");
+                panels.forEach(function (panel) {
+                  panel.style.transition =
+                    "transform var(--panel-ms) var(--panel-ease), width var(--panel-ms) var(--panel-ease)";
+                  panel.style.transform = "";
+                  panel._moving = true;
+                  clearTimeout(panel._moveTimer);
+                  panel._moveTimer = setTimeout(function () {
+                    panel._moving = false;
+                    panel.style.transition = "";
+                    panel.style.transformOrigin = "";
+                  }, 1000);
+                });
+              });
+            });
+          });
+          panels.forEach(function (panel) {
+            panel.addEventListener("transitionend", function (event) {
+              if (event.propertyName !== "transform") return;
+              clearTimeout(panel._moveTimer);
+              panel._moving = false;
+              panel.style.transition = "";
+              panel.style.transformOrigin = "";
+            });
+          });
+        })();
+
         var chromeOn = false;
         var chromeUsed = false;
         var chromeZoomed = false;
@@ -1827,17 +2133,19 @@
           if (img.complete && img.naturalWidth) measureLogo(img);
         }
 
-        var flowCanvas = document.querySelector(".logo-flow");
-        if (flowCanvas) startLogoFlow(flowCanvas);
+        var flowMark = document.querySelector(".logo-flow");
+        if (flowMark) startLogoFlow(flowMark);
 
         var scene = startScene(document.querySelector(".bg"));
         if (scene) scene.set(true);
         requestAnimationFrame(sampleLogo);
 
-        function startLogoFlow(canvas) {
-          var ctx = canvas.getContext("2d");
-          if (!ctx) return;
+        function startLogoFlow(svg) {
+          var openInk = svg.querySelector("#logo-open-ink");
+          var wedgeInk = svg.querySelector("#logo-wedge-ink");
+          if (!openInk || !wedgeInk) return;
 
+          var NS = "http://www.w3.org/2000/svg";
           var BOX = 1024;
           var CENTER = 512;
           var R_MIN = 230;
@@ -1855,18 +2163,12 @@
           var SPARK_SPEED = 210;
           var SPARK_PAUSE = 0.22;
           var SPARK_MAX = 12;
-          var WEDGE = new Path2D(
-            "M 873.961 150.039 A 511.89 511.89 0 0 1 873.961 873.961 L 640.743 640.743 A 182.07 182.07 0 0 0 640.743 383.257 Z"
-          );
-          var OPEN = new Path2D();
-          OPEN.rect(0, 0, BOX, BOX);
-          OPEN.addPath(WEDGE);
+          var pools = {};
 
           var points = [];
           var links = [];
           var sparks = [];
           var scale = 1;
-          var dpr = 1;
           var clock = 0;
           var nextSpawn = 0;
           var nextSpark = 0;
@@ -2092,75 +2394,94 @@
             });
           }
 
-          function paint(ink, glow, rimmed) {
+          function nodes(group, key, tag, count) {
+            var bucket = pools[group.id] || (pools[group.id] = {});
+            var list = bucket[key] || (bucket[key] = []);
+            var host = group.querySelector('[data-kind="' + key + '"]');
+            while (list.length < count) {
+              var el = document.createElementNS(NS, tag);
+              if (tag === "line") el.setAttribute("fill", "none");
+              host.appendChild(el);
+              list.push(el);
+            }
+            for (var i = count; i < list.length; i++) {
+              if (list[i].getAttribute("display") !== "none") list[i].setAttribute("display", "none");
+            }
+            return list;
+          }
+
+          function paint(group, ink, glow, rimmed) {
             var px = 1 / scale;
             var dot = dotSize();
             var spark = Math.max(SPARK, 1.3 * px);
             var rim = rimmed ? 0.9 * px : 0;
-
-            ctx.lineWidth = 1.4 * px;
-            ctx.lineCap = "round";
-            ctx.strokeStyle = ink;
-            links.forEach(function (link) {
+            var width = 1.4 * px;
+            var lines = nodes(group, "line", "line", links.length);
+            for (var i = 0; i < links.length; i++) {
+              var link = links[i];
               var alpha = 0.85 * (1 - (link.d / LINK) * (link.d / LINK));
               if (carrying(link)) alpha = Math.max(alpha, 0.45);
-              ctx.globalAlpha = alpha * Math.min(link.p.alpha, link.q.alpha);
-              ctx.beginPath();
-              ctx.moveTo(link.p.x, link.p.y);
-              ctx.lineTo(link.q.x, link.q.y);
-              ctx.stroke();
-            });
+              var line = lines[i];
+              line.setAttribute("display", "");
+              line.setAttribute("x1", link.p.x);
+              line.setAttribute("y1", link.p.y);
+              line.setAttribute("x2", link.q.x);
+              line.setAttribute("y2", link.q.y);
+              line.setAttribute("stroke", ink);
+              line.setAttribute("stroke-width", width);
+              line.setAttribute("stroke-linecap", "round");
+              line.setAttribute("opacity", alpha * Math.min(link.p.alpha, link.q.alpha));
+            }
 
-            ctx.fillStyle = ink;
-            points.forEach(function (p) {
-              ctx.globalAlpha = p.alpha;
-              ctx.beginPath();
-              ctx.arc(p.x, p.y, dot, 0, Math.PI * 2);
-              ctx.fill();
-            });
+            var dots = nodes(group, "dot", "circle", points.length);
+            for (var d = 0; d < points.length; d++) {
+              var point = points[d];
+              var mark = dots[d];
+              mark.setAttribute("display", "");
+              mark.setAttribute("cx", point.x);
+              mark.setAttribute("cy", point.y);
+              mark.setAttribute("r", dot);
+              mark.setAttribute("fill", ink);
+              mark.setAttribute("opacity", point.alpha);
+            }
 
-            sparks.forEach(function (s) {
-              var x = s.to ? s.at.x + (s.to.x - s.at.x) * s.t : s.at.x;
-              var y = s.to ? s.at.y + (s.to.y - s.at.y) * s.t : s.at.y;
-              var seen = s.to ? s.at.alpha + (s.to.alpha - s.at.alpha) * s.t : s.at.alpha;
-              ctx.globalAlpha = Math.max(0, Math.min(1, s.show * seen));
+            var rims = nodes(group, "rim", "circle", rim ? sparks.length : 0);
+            var glints = nodes(group, "spark", "circle", sparks.length);
+            for (var s = 0; s < sparks.length; s++) {
+              var sparkPoint = sparks[s];
+              var x = sparkPoint.to ? sparkPoint.at.x + (sparkPoint.to.x - sparkPoint.at.x) * sparkPoint.t : sparkPoint.at.x;
+              var y = sparkPoint.to ? sparkPoint.at.y + (sparkPoint.to.y - sparkPoint.at.y) * sparkPoint.t : sparkPoint.at.y;
+              var seen = sparkPoint.to ? sparkPoint.at.alpha + (sparkPoint.to.alpha - sparkPoint.at.alpha) * sparkPoint.t : sparkPoint.at.alpha;
+              var shown = Math.max(0, Math.min(1, sparkPoint.show * seen));
               if (rim) {
-                ctx.fillStyle = ink;
-                ctx.beginPath();
-                ctx.arc(x, y, spark + rim, 0, Math.PI * 2);
-                ctx.fill();
+                var halo = rims[s];
+                halo.setAttribute("display", "");
+                halo.setAttribute("cx", x);
+                halo.setAttribute("cy", y);
+                halo.setAttribute("r", spark + rim);
+                halo.setAttribute("fill", ink);
+                halo.setAttribute("opacity", shown);
               }
-              ctx.fillStyle = glow;
-              ctx.beginPath();
-              ctx.arc(x, y, spark, 0, Math.PI * 2);
-              ctx.fill();
-            });
-            ctx.globalAlpha = 1;
+              var glint = glints[s];
+              glint.setAttribute("display", "");
+              glint.setAttribute("cx", x);
+              glint.setAttribute("cy", y);
+              glint.setAttribute("r", spark);
+              glint.setAttribute("fill", glow);
+              glint.setAttribute("opacity", shown);
+            }
           }
 
           function draw() {
-            ctx.setTransform(dpr * scale, 0, 0, dpr * scale, 0, 0);
-            ctx.clearRect(0, 0, BOX, BOX);
-
             var light = root.dataset.logo === "light";
-            ctx.save();
-            ctx.clip(OPEN, "evenodd");
-            paint(light ? "#fff" : "#000", light ? "#000" : "#fff", false);
-            ctx.restore();
-
-            ctx.save();
-            ctx.clip(WEDGE);
-            paint(light ? "#000" : "#fff", light ? "#fff" : "#000", true);
-            ctx.restore();
+            paint(openInk, light ? "#fff" : "#000", light ? "#000" : "#fff", false);
+            paint(wedgeInk, light ? "#000" : "#fff", light ? "#fff" : "#000", true);
           }
 
           function resize() {
-            var size = canvas.clientWidth;
+            var size = svg.clientWidth;
             if (!size) return;
-            dpr = Math.min(window.devicePixelRatio || 1, 2);
             scale = size / BOX;
-            canvas.width = Math.round(size * dpr);
-            canvas.height = Math.round(size * dpr);
             draw();
           }
 
@@ -2182,11 +2503,11 @@
 
           for (var warm = 0; warm < 1050; warm++) step(1 / 30);
 
-          new ResizeObserver(resize).observe(canvas);
+          new ResizeObserver(resize).observe(svg);
           new IntersectionObserver(function (entries) {
             onScreen = entries[0].isIntersecting;
             play();
-          }).observe(canvas);
+          }).observe(svg);
           if (still.addEventListener) still.addEventListener("change", play);
           redrawLogo = draw;
           play();
