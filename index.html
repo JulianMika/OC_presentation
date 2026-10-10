@@ -2,8 +2,8 @@
 <html lang="en" data-theme="white" data-lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="theme-color" content="#ffffff" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#1d2a1c" />
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
@@ -102,7 +102,7 @@
       html {
         height: 100%;
         overflow: hidden;
-        background: #000;
+        background: #1d2a1c;
         touch-action: manipulation;
         -webkit-text-size-adjust: 100%;
       }
@@ -599,6 +599,7 @@
         display: grid;
         place-items: center;
         width: min(46.2vw, 242px);
+        height: min(46.2vw, 242px);
         aspect-ratio: 1;
         overflow: hidden;
         background: transparent;
@@ -624,7 +625,7 @@
         display: block;
         width: 100%;
         height: 100%;
-        object-fit: cover;
+        object-fit: contain;
         -webkit-touch-callout: none;
         user-select: none;
       }
@@ -663,18 +664,20 @@
         align-items: center;
         justify-content: center;
         height: var(--app-height);
-        padding:
-          calc(1.5rem + env(safe-area-inset-top, 0px))
-          0
-          calc(1.5rem + env(safe-area-inset-bottom, 0px))
-          0;
+        padding: 0;
         container-type: size;
         transition: padding var(--panel-ms) var(--panel-ease);
       }
 
       .pair {
-        --s: min(calc(100cqh - 3rem), calc((100cqw - max(7.5rem, 18cqw)) / 2));
-        --g: calc((100cqw - 2 * var(--s)) / 3);
+        --gap: 1.25rem;
+        --edge-x: max(var(--gap), env(safe-area-inset-left, 0px), env(safe-area-inset-right, 0px));
+        --edge-y: max(var(--gap), env(safe-area-inset-top, 0px), env(safe-area-inset-bottom, 0px));
+        --s: min(
+          calc((100cqw - 2 * var(--edge-x) - var(--gap)) / 2),
+          calc(100cqh - 2 * var(--edge-y))
+        );
+        --g: max(var(--edge-x), calc((100cqw - 2 * var(--s)) / 3));
         position: relative;
         z-index: 1;
         align-self: stretch;
@@ -685,9 +688,11 @@
       .panel {
         position: absolute;
         width: var(--s);
+        height: var(--s);
         aspect-ratio: 1;
         top: calc(50% - var(--s) / 2);
         left: var(--g);
+        overflow: hidden;
         background: var(--glass);
         backdrop-filter: blur(12px);
         -webkit-backdrop-filter: blur(12px);
@@ -704,68 +709,128 @@
       }
 
       .panel-copy {
+        --copy: clamp(0.805rem, calc(var(--s) * 0.0283), 1.38rem);
         display: flex;
         flex-direction: column;
         box-sizing: border-box;
-        padding: 7%;
+        padding: calc(var(--s) * 0.062);
         color: #111;
+        font-size: var(--copy);
         text-align: left;
         container-type: size;
       }
 
       .panel-title {
+        font-family: "Bauhaus 93", "Saira Stencil One", sans-serif;
+        font-weight: 400;
+        font-synthesis: none;
         margin: 0 0 0.55em;
-        font-size: 6.6cqw;
-        font-weight: 700;
+        font-size: 1.55em;
         line-height: 1.15;
       }
 
       .panel-text {
-        flex: 1;
-        margin: 0;
-        overflow: auto;
-        font-size: 4.15cqw;
+        font-family: "Inter OC", "Inter", system-ui, sans-serif;
         font-weight: 500;
+        flex: 1 1 auto;
+        min-height: 0;
+        margin: 0;
+        overflow-x: hidden;
+        overflow-y: auto;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+        font-size: 1em;
         line-height: 1.35;
       }
 
+      .panel-text::-webkit-scrollbar {
+        display: none;
+      }
+
+      .panel-text p {
+        margin: 0;
+      }
+
+      .panel-text p + p {
+        margin-top: 0.85em;
+      }
+
       .panel-pages {
+        position: relative;
+        z-index: 1;
+        flex: none;
         display: flex;
         align-items: center;
         justify-content: space-between;
-        gap: 0.4rem;
-        margin-top: 0.7em;
-        font-size: 3.8cqw;
+        gap: 0.75em;
+        margin-top: 0.85em;
+        font-family: "Inter OC", "Inter", system-ui, sans-serif;
+        font-size: 0.95em;
         font-weight: 600;
+        font-variant-numeric: tabular-nums;
+      }
+
+      .panel-count {
+        min-width: 4.2em;
+        text-align: center;
       }
 
       .panel-step {
         appearance: none;
-        border: none;
+        -webkit-appearance: none;
+        display: grid;
+        place-items: center;
+        flex: 0 0 auto;
+        width: 2.63em;
+        height: 2.63em;
+        padding: 0;
+        color: #111;
+        font-size: inherit;
         background: transparent;
-        color: inherit;
-        font: inherit;
-        line-height: 1;
-        padding: 0.25em 0.45em;
+        border: 1px solid #111;
+        border-radius: 50%;
+        box-shadow: none;
         cursor: pointer;
+        touch-action: manipulation;
+        -webkit-tap-highlight-color: transparent;
+      }
+
+      .panel-step-icon {
+        display: block;
+        box-sizing: border-box;
+        height: 2.52em;
+        width: auto;
+        aspect-ratio: 578 / 1024;
+        object-fit: contain;
+        object-position: center;
+        pointer-events: none;
+        user-select: none;
+      }
+
+      .panel-step[data-dir="1"] .panel-step-icon {
+        transform: scaleX(-1);
+      }
+
+      .panel-step:active:not(:disabled),
+      .panel-step:focus-visible:not(:disabled) {
+        background: #fff;
+        backdrop-filter: none;
+        -webkit-backdrop-filter: none;
+        outline: none;
       }
 
       .panel-step:disabled {
-        opacity: 0.35;
-        cursor: default;
+        visibility: hidden;
+        pointer-events: none;
       }
 
       @media (max-width: calc(100dvh - 1.75rem)) {
-        .slide-pair {
-          padding-top: 0;
-          padding-bottom: 0;
-          padding-left: calc(1.5rem + env(safe-area-inset-left, 0px));
-          padding-right: calc(1.5rem + env(safe-area-inset-right, 0px));
-        }
-
         .pair {
-          --s: min(78cqw, calc((100cqh - max(7.5rem, 18cqh)) / 2));
-          --g: calc((100cqh - 2 * var(--s)) / 3);
+          --s: min(
+            calc((100cqh - 2 * var(--edge-y) - var(--gap)) / 2),
+            calc(100cqw - 2 * var(--edge-x))
+          );
+          --g: max(var(--edge-y), calc((100cqh - 2 * var(--s)) / 3));
         }
 
         .panel,
@@ -776,17 +841,6 @@
 
         .panel:last-child {
           top: calc(100% - var(--g) - var(--s));
-        }
-      }
-
-      @media (max-width: 480px) and (min-height: 760px) {
-        .slide-pair {
-          padding-left: calc(0.75rem + env(safe-area-inset-left, 0px));
-          padding-right: calc(0.75rem + env(safe-area-inset-right, 0px));
-        }
-
-        .pair {
-          --s: min(100cqw, calc((100cqh - 3.75rem) / 2));
         }
       }
 
@@ -1011,7 +1065,8 @@
         .lang-option,
         .background-option,
         .panel,
-        .slide-pair {
+        .slide-pair,
+        .panel-step {
           transition: none;
         }
       }
@@ -1103,44 +1158,44 @@
       </section>
       <section class="slide slide-pair" data-slide="middle-1">
         <div class="pair">
+          <div class="panel"></div>
           <div class="panel panel-copy" data-mission="0">
             <h2 class="panel-title"></h2>
             <p class="panel-text"></p>
             <div class="panel-pages">
-              <button type="button" class="panel-step" data-dir="-1" aria-label="Previous">‹</button>
+              <button type="button" class="panel-step" data-dir="-1" aria-label="Previous"><img class="panel-step-icon" src="assets/back-icon.png" alt="" width="578" height="1024" decoding="async" /></button>
               <span class="panel-count"></span>
-              <button type="button" class="panel-step" data-dir="1" aria-label="Next">›</button>
+              <button type="button" class="panel-step" data-dir="1" aria-label="Next"><img class="panel-step-icon" src="assets/back-icon.png" alt="" width="578" height="1024" decoding="async" /></button>
             </div>
           </div>
-          <div class="panel"></div>
         </div>
       </section>
       <section class="slide slide-pair" data-slide="middle-2">
         <div class="pair">
+          <div class="panel"></div>
           <div class="panel panel-copy" data-mission="1">
             <h2 class="panel-title"></h2>
             <p class="panel-text"></p>
             <div class="panel-pages">
-              <button type="button" class="panel-step" data-dir="-1" aria-label="Previous">‹</button>
+              <button type="button" class="panel-step" data-dir="-1" aria-label="Previous"><img class="panel-step-icon" src="assets/back-icon.png" alt="" width="578" height="1024" decoding="async" /></button>
               <span class="panel-count"></span>
-              <button type="button" class="panel-step" data-dir="1" aria-label="Next">›</button>
+              <button type="button" class="panel-step" data-dir="1" aria-label="Next"><img class="panel-step-icon" src="assets/back-icon.png" alt="" width="578" height="1024" decoding="async" /></button>
             </div>
           </div>
-          <div class="panel"></div>
         </div>
       </section>
       <section class="slide slide-pair" data-slide="middle-3">
         <div class="pair">
+          <div class="panel"></div>
           <div class="panel panel-copy" data-mission="2">
             <h2 class="panel-title"></h2>
             <p class="panel-text"></p>
             <div class="panel-pages">
-              <button type="button" class="panel-step" data-dir="-1" aria-label="Previous">‹</button>
+              <button type="button" class="panel-step" data-dir="-1" aria-label="Previous"><img class="panel-step-icon" src="assets/back-icon.png" alt="" width="578" height="1024" decoding="async" /></button>
               <span class="panel-count"></span>
-              <button type="button" class="panel-step" data-dir="1" aria-label="Next">›</button>
+              <button type="button" class="panel-step" data-dir="1" aria-label="Next"><img class="panel-step-icon" src="assets/back-icon.png" alt="" width="578" height="1024" decoding="async" /></button>
             </div>
           </div>
-          <div class="panel"></div>
         </div>
       </section>
       <section class="slide slide-end" data-slide="end">
@@ -1341,9 +1396,39 @@
           });
         }
 
-        var mission = [
+        var missionEn = [
           {
             title: "Intelligence shapes the universe",
+            paragraphs: [
+              "Everything in our universe that can think and learn follows the same laws of nature. Even so, no two intelligences are alike, because each one adapts to its own environment.",
+              "We speak of intelligence when something recognizes patterns in its environment, forms its own picture of the world from them, and acts on it. As soon as that happens, a reality of its own emerges: the world as this intelligence sees it.",
+              "What an intelligence has already understood is normal and predictable to it. Everything new is a puzzle at first, until it has understood it. So learning means turning puzzles into understanding.",
+              "What an intelligence has understood, it can also use. And because many intelligences share the same environment, they influence one another, especially when they know roughly the same amount.",
+              "If an intelligence knows far more than the others around it, it can help shape their environment and so influence them as well. This is how intelligences stack on top of each other: whoever understands more stands higher up.",
+              "In short: the universe consists of fixed laws of nature and of intelligences that gradually come to understand these laws. The more an intelligence understands, the more it can shape its environment, and with it the reality of others. Physics always remains the foundation, but within it, every intelligence sets its own rules."
+            ]
+          },
+          {
+            title: "Human intelligence should shape the universe",
+            paragraphs: [
+              "For us, one intelligence is especially important: the human one. People learn from each other, build on each other, influence each other, and also keep each other in check.",
+              "By now, however, there is also an intelligence that is not human and yet lives right among us: artificial intelligence. Its environment is the world that we humans have built for it.",
+              "Our goal should be for every person to get the best possible reality. To achieve this, we should influence each other less and follow our own perception more. What each individual sees and thinks should flow as directly as possible into the shared intelligence of all people.",
+              "Every person should have as much influence as possible over their own reality, so they can lead the life that is best for them. And that holds in the long run too: humanity should exist for as long as possible, so that as many people as possible can have a fulfilling life."
+            ]
+          },
+          {
+            title: "OC brings human intelligence to the fundamentals",
+            paragraphs: [
+              "For every person to lead the best possible life, it takes a system in which everyone has an equal voice: everyone forms their own view of the world, on equal terms with everyone else and as free as possible from outside influence. That way, everyone can freely follow their own path to insight. Together, this adds up to a greater whole that brings together how people see the world and what they wish for. Artificial intelligence should stand beneath it and turn these wishes into reality as well as possible.",
+              "This is exactly the system OC is meant to embody: OC will become the interface that gathers the perspectives and opinions of all people and brings them together into a shared picture. From this comes a clear mandate for shaping reality the way people wish it to be."
+            ]
+          }
+        ];
+
+        var missionDe = [
+          {
+            title: "Intelligenz formt das Universum",
             paragraphs: [
               "Alles, was in unserem Universum denken und lernen kann, folgt denselben Naturgesetzen. Trotzdem ist keine Intelligenz wie die andere, denn jede passt sich an ihre eigene Umgebung an.",
               "Von Intelligenz sprechen wir, wenn etwas Muster in seiner Umgebung erkennt, sich daraus ein eigenes Bild der Welt macht und danach handelt. Sobald das passiert, entsteht eine eigene Realität: die Welt, so wie diese Intelligenz sie sieht.",
@@ -1354,7 +1439,7 @@
             ]
           },
           {
-            title: "Human intelligence should shape the universe",
+            title: "Menschliche Intelligenz sollte das Universum formen",
             paragraphs: [
               "Für uns ist eine Intelligenz besonders wichtig: die menschliche. Menschen lernen voneinander, bauen aufeinander auf, beeinflussen sich und kontrollieren sich auch gegenseitig.",
               "Inzwischen gibt es aber auch eine Intelligenz, die nicht menschlich ist und trotzdem mitten unter uns lebt: die künstliche Intelligenz. Ihre Umgebung ist die Welt, die wir Menschen für sie gebaut haben.",
@@ -1363,28 +1448,65 @@
             ]
           },
           {
-            title: "OC brings human intelligence to the fundamentals",
+            title: "OC bringt menschliche Intelligenz in die Grundlagen ein",
             paragraphs: [
               "Damit jeder Mensch das bestmögliche Leben führen kann, braucht es ein System, in dem jeder die gleiche Stimme hat: Jeder formt seine Sicht auf die Welt selbst, gleichberechtigt mit allen anderen und möglichst ohne fremde Beeinflussung. So kann jeder frei seinen eigenen Weg zur Erkenntnis gehen. Zusammen ergibt das ein großes Ganzes, das bündelt, wie die Menschen die Welt sehen und was sie sich wünschen. Künstliche Intelligenz sollte darunter stehen und diese Wünsche bestmöglich in der Realität umsetzen.",
               "Genau dieses System soll OC verkörpern: OC wird die Schnittstelle, die die Sichtweisen und Meinungen aller Menschen sammelt und zu einem gemeinsamen Bild zusammenführt. Daraus entsteht ein klarer Auftrag, mit dem die Realität so gestaltet wird, wie die Menschen es sich wünschen."
             ]
           }
         ];
+
+        var mission = { en: missionEn, de: missionDe };
         var missionPage = [0, 0, 0];
+
+        function titleLines(title) {
+          var lineHeight = parseFloat(getComputedStyle(title).lineHeight);
+          if (!lineHeight) return 1;
+          return Math.round(title.getBoundingClientRect().height / lineHeight);
+        }
+
+        function fitTitle(title) {
+          title.style.fontSize = "";
+          if (titleLines(title) <= 2) return;
+          var high = parseFloat(getComputedStyle(title).fontSize);
+          var low = parseFloat(getComputedStyle(title.closest(".panel-copy")).fontSize);
+          var best = low;
+          var step;
+          for (step = 0; step < 8; step++) {
+            var mid = (low + high) / 2;
+            title.style.fontSize = mid.toFixed(2) + "px";
+            if (titleLines(title) <= 2) {
+              best = mid;
+              low = mid;
+            } else {
+              high = mid;
+            }
+          }
+          title.style.fontSize = best.toFixed(2) + "px";
+        }
 
         function showMission() {
           var labels = copy[lang()];
+          var chapters = mission[lang()];
           document.querySelectorAll(".panel-copy").forEach(function (panel) {
             var index = Number(panel.dataset.mission);
-            var chapter = mission[index];
+            var chapter = chapters[index];
+            var text = panel.querySelector(".panel-text");
+            var title = panel.querySelector(".panel-title");
             var page = missionPage[index];
-            panel.querySelector(".panel-title").textContent = chapter.title;
-            panel.querySelector(".panel-text").textContent = chapter.paragraphs[page];
+            if (page > chapter.paragraphs.length - 1) page = chapter.paragraphs.length - 1;
+            if (page < 0) page = 0;
+            missionPage[index] = page;
+            title.textContent = chapter.title;
+            fitTitle(title);
+            text.textContent = chapter.paragraphs[page];
             panel.querySelector(".panel-count").textContent = (page + 1) + " / " + chapter.paragraphs.length;
             var prev = panel.querySelector("[data-dir='-1']");
             var next = panel.querySelector("[data-dir='1']");
             prev.disabled = page === 0;
             next.disabled = page === chapter.paragraphs.length - 1;
+            prev.setAttribute("aria-hidden", String(prev.disabled));
+            next.setAttribute("aria-hidden", String(next.disabled));
             prev.setAttribute("aria-label", labels.pagePrev);
             next.setAttribute("aria-label", labels.pageNext);
           });
@@ -1396,10 +1518,11 @@
           var panel = button.closest(".panel-copy");
           var index = Number(panel.dataset.mission);
           var page = missionPage[index] + Number(button.dataset.dir);
-          var chapter = mission[index];
+          var chapter = mission[lang()][index];
           if (page < 0 || page >= chapter.paragraphs.length) return;
           missionPage[index] = page;
           showMission();
+          panel.querySelector(".panel-text").scrollTop = 0;
         });
 
         function render() {
@@ -1425,7 +1548,7 @@
           });
 
           if (themeMeta) {
-            themeMeta.setAttribute("content", currentTheme === "black" ? "#111111" : "#ffffff");
+            themeMeta.setAttribute("content", "#1d2a1c");
           }
 
           fitSlogan();
@@ -1629,20 +1752,37 @@
           return { widest: widest, count: lines.length };
         }
 
+        var viewportWidth = window.innerWidth;
+        var viewportHeight = window.innerHeight;
+
         window.addEventListener("resize", syncViewport);
+        if (window.visualViewport) {
+          window.visualViewport.addEventListener("resize", syncViewport);
+          window.visualViewport.addEventListener("scroll", syncViewport);
+        }
         document.fonts.ready.then(function () {
           fitSlogan();
           matchXWidget();
           sampleLogo();
+          showMission();
         });
         new ResizeObserver(queueMatchXWidget).observe(document.querySelector(".release-widget"));
+        var pageObserver = new ResizeObserver(function () { showMission(); });
+        document.querySelectorAll(".panel-copy").forEach(function (panel) {
+          pageObserver.observe(panel);
+        });
 
-        var viewportWidth = window.innerWidth;
-        var viewportHeight = window.innerHeight;
+        function viewportSize() {
+          return {
+            width: window.innerWidth,
+            height: window.innerHeight
+          };
+        }
 
         function syncViewport() {
-          var width = window.innerWidth;
-          var height = window.innerHeight;
+          var size = viewportSize();
+          var width = size.width;
+          var height = size.height;
           var widthChanged = width !== viewportWidth;
           var heightChanged = height !== viewportHeight;
           if (widthChanged || heightChanged) {
@@ -2119,6 +2259,7 @@
         }
 
         function sampleLogo() {
+          if (!logoPhotos) return;
           var url = photoUrl();
           if (!url) return;
           var img = logoPhotos[url];
