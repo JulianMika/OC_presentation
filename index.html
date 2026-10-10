@@ -700,6 +700,7 @@
         border-radius: 1.5rem;
         transition:
           width var(--panel-ms) var(--panel-ease),
+          height var(--panel-ms) var(--panel-ease),
           left var(--panel-ms) var(--panel-ease),
           top var(--panel-ms) var(--panel-ease);
       }
@@ -734,7 +735,8 @@
         font-weight: 500;
         flex: 1 1 auto;
         min-height: 0;
-        margin: 0;
+        margin: -0.15em -0.2em;
+        padding: 0.15em 0.2em;
         overflow-x: hidden;
         overflow-y: auto;
         scrollbar-width: none;
@@ -745,6 +747,76 @@
 
       .panel-text::-webkit-scrollbar {
         display: none;
+      }
+
+      .panel-beat {
+        border-radius: 0.3em;
+        background-color: rgba(255, 255, 255, 0);
+        box-shadow: 0 0 0 0.14em rgba(255, 255, 255, 0);
+        -webkit-box-decoration-break: clone;
+        box-decoration-break: clone;
+        transition:
+          opacity 0.45s ease,
+          background-color 0.45s ease,
+          box-shadow 0.45s ease;
+      }
+
+      .panel-text.is-telling .panel-beat {
+        opacity: 0.58;
+      }
+
+      .panel-text.is-telling .panel-beat.is-on {
+        opacity: 1;
+        background-color: rgba(255, 255, 255, 0.72);
+        box-shadow: 0 0 0 0.14em rgba(255, 255, 255, 0.72);
+      }
+
+      .panel-text.has-beats .panel-beat {
+        cursor: pointer;
+        -webkit-tap-highlight-color: transparent;
+      }
+
+      .panel-art-box {
+        cursor: pointer;
+        -webkit-tap-highlight-color: transparent;
+      }
+
+      .panel-art,
+      .panel-labels {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+      }
+
+      .panel-art {
+        display: block;
+      }
+
+      .panel-labels {
+        overflow: hidden;
+        pointer-events: none;
+        container-type: size;
+      }
+
+      .panel-label {
+        position: absolute;
+        left: 0;
+        top: 0;
+        max-width: 54%;
+        padding: 0.2em 0.65em;
+        color: #111;
+        font-family: "Inter OC", "Inter", system-ui, sans-serif;
+        font-size: clamp(0.7rem, 3.5cqw, 1.15rem);
+        font-weight: 600;
+        line-height: 1.15;
+        text-align: center;
+        background: rgba(255, 255, 255, 0.62);
+        border-radius: 999px;
+        box-shadow: 0 0 0.7em 0.3em rgba(255, 255, 255, 0.62);
+        opacity: 0;
+        visibility: hidden;
+        transform: translate(-50%, -50%);
       }
 
       .panel-text p {
@@ -824,7 +896,7 @@
         pointer-events: none;
       }
 
-      @media (max-width: calc(100dvh - 1.75rem)) {
+      @media (orientation: portrait) {
         .pair {
           --s: min(
             calc((100cqh - 2 * var(--edge-y) - var(--gap)) / 2),
@@ -1158,7 +1230,10 @@
       </section>
       <section class="slide slide-pair" data-slide="middle-1">
         <div class="pair">
-          <div class="panel"></div>
+          <div class="panel panel-art-box" data-art="0">
+            <canvas class="panel-art" aria-hidden="true"></canvas>
+            <div class="panel-labels" aria-hidden="true"></div>
+          </div>
           <div class="panel panel-copy" data-mission="0">
             <h2 class="panel-title"></h2>
             <p class="panel-text"></p>
@@ -1172,7 +1247,10 @@
       </section>
       <section class="slide slide-pair" data-slide="middle-2">
         <div class="pair">
-          <div class="panel"></div>
+          <div class="panel panel-art-box" data-art="1">
+            <canvas class="panel-art" aria-hidden="true"></canvas>
+            <div class="panel-labels" aria-hidden="true"></div>
+          </div>
           <div class="panel panel-copy" data-mission="1">
             <h2 class="panel-title"></h2>
             <p class="panel-text"></p>
@@ -1186,7 +1264,10 @@
       </section>
       <section class="slide slide-pair" data-slide="middle-3">
         <div class="pair">
-          <div class="panel"></div>
+          <div class="panel panel-art-box" data-art="2">
+            <canvas class="panel-art" aria-hidden="true"></canvas>
+            <div class="panel-labels" aria-hidden="true"></div>
+          </div>
           <div class="panel panel-copy" data-mission="2">
             <h2 class="panel-title"></h2>
             <p class="panel-text"></p>
@@ -1336,7 +1417,19 @@
             bgSnow: "Extrem landscape Theme",
             bgForest: "Forest Theme",
             pagePrev: "Previous",
-            pageNext: "Next"
+            pageNext: "Next",
+            art: {
+              laws: "Laws of nature",
+              intelligence: "Intelligence",
+              reality: "Reality",
+              puzzle: "Puzzle",
+              human: "Human",
+              ai: "AI",
+              common: "Shared intelligence",
+              whole: "Greater whole",
+              oc: "OC",
+              mandate: "Mandate"
+            }
           },
           de: {
             slogan: "Die Basis für menschenzentrierte Lösungen",
@@ -1353,7 +1446,19 @@
             bgSnow: "Extremlandschaft-Thema",
             bgForest: "Wald-Thema",
             pagePrev: "Zurück",
-            pageNext: "Weiter"
+            pageNext: "Weiter",
+            art: {
+              laws: "Naturgesetze",
+              intelligence: "Intelligenz",
+              reality: "Realität",
+              puzzle: "Rätsel",
+              human: "Mensch",
+              ai: "KI",
+              common: "Gemeinsame Intelligenz",
+              whole: "Großes Ganzes",
+              oc: "OC",
+              mandate: "Auftrag"
+            }
           }
         };
 
@@ -1459,6 +1564,2377 @@
         var mission = { en: missionEn, de: missionDe };
         var missionPage = [0, 0, 0];
 
+        /* ---------- Erklaer-Grafiken: Hilfen ---------- */
+        function artRandom(seed) {
+          return function () {
+            seed = (seed + 0x6d2b79f5) | 0;
+            var t = Math.imul(seed ^ (seed >>> 15), 1 | seed);
+            t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+            return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+          };
+        }
+
+        function artIsObj(value) {
+          return value !== null && typeof value === "object" && !Array.isArray(value);
+        }
+
+        function artClone(value) {
+          if (Array.isArray(value)) return value.map(artClone);
+          if (artIsObj(value)) {
+            var copyOf = {};
+            Object.keys(value).forEach(function (key) {
+              copyOf[key] = artClone(value[key]);
+            });
+            return copyOf;
+          }
+          return value;
+        }
+
+        function artMerge(target, source) {
+          Object.keys(source).forEach(function (key) {
+            var value = source[key];
+            if (artIsObj(value)) {
+              if (!artIsObj(target[key])) target[key] = {};
+              artMerge(target[key], value);
+            } else {
+              target[key] = artClone(value);
+            }
+          });
+        }
+
+        var ART_LINEAR = { build: 0.42, draw: 0.8, solved: 0.55, order: 0.5, n: 6 };
+
+        function artApproach(current, target, k, dt) {
+          Object.keys(target).forEach(function (key) {
+            var goal = target[key];
+            var now = current[key];
+            if (typeof goal === "number") {
+              if (typeof now !== "number") {
+                current[key] = goal;
+              } else if (ART_LINEAR[key]) {
+                var reach = ART_LINEAR[key] * dt;
+                current[key] = now + Math.max(-reach, Math.min(reach, goal - now));
+              } else {
+                current[key] = now + (goal - now) * k;
+              }
+            } else if (artIsObj(goal)) {
+              if (!artIsObj(now)) current[key] = now = {};
+              artApproach(now, goal, k, dt);
+            } else {
+              current[key] = goal;
+            }
+          });
+        }
+
+        function startMissionArt(cfg) {
+          var canvas = cfg.canvas;
+          var layer = cfg.layer;
+          var host = cfg.host;
+          var spec = cfg.spec;
+          var ctx = canvas.getContext("2d");
+          if (!ctx) return null;
+
+          var TAU = Math.PI * 2;
+          var GOLD = 2.39996;
+          var HOP_SPEED = 170;
+          var HOP_PAUSE = 0.2;
+          var TIE_REACH = 300;
+          var still = window.matchMedia("(prefers-reduced-motion: reduce)");
+          var rand = artRandom(spec.seed || 7);
+          var OUT = { x: 0, y: 0, env: 1 };
+          var WEDGE = "M 873.961 150.039 A 511.89 511.89 0 0 1 873.961 873.961 L 640.743 640.743 A 182.07 182.07 0 0 0 640.743 383.257 Z";
+          var wedgePath = window.Path2D ? new Path2D(WEDGE) : null;
+          var openPath = window.Path2D ? new Path2D("M 0 0 H 1024 V 1024 H 0 Z " + WEDGE) : null;
+
+          function clamp(value, low, high) {
+            return Math.max(low, Math.min(high, value));
+          }
+
+          function lerp(from, to, t) {
+            return from + (to - from) * t;
+          }
+
+          function smooth(value) {
+            var t = clamp(value, 0, 1);
+            return t * t * (3 - 2 * t);
+          }
+
+          function dist(p, q) {
+            var dx = q.x - p.x;
+            var dy = q.y - p.y;
+            return Math.sqrt(dx * dx + dy * dy);
+          }
+
+          /* ---------- Zeitleiste ---------- */
+          var pages = spec.pages || [];
+          var cum = [];
+          var run = artClone(spec.init);
+          pages.forEach(function (frames, index) {
+            cum[index] = (frames || []).map(function (frame) {
+              artMerge(run, frame.set || {});
+              return artClone(run);
+            });
+          });
+
+          var S = artClone(spec.init);
+          var T = artClone(spec.init);
+          var page = 0;
+          var beats = 0;
+          var beat = -1;
+          var beatT = 0;
+          var durations = [];
+          var pending = false;
+          var inView = false;
+          var focused = false;
+          var focusSet = null;
+          var focusMix = 0;
+          var clock = 0;
+          var last = 0;
+          var raf = 0;
+          var rafAt = 0;
+
+          function has(index) {
+            return !!(cum[index] && cum[index].length);
+          }
+
+          function endState(index) {
+            for (var i = Math.min(index, cum.length - 1); i >= 0; i--) {
+              if (cum[i] && cum[i].length) return cum[i][cum[i].length - 1];
+            }
+            return spec.init;
+          }
+
+          /* ---------- Gitter ---------- */
+          var grid = spec.grid || null;
+          var gx = [];
+          var gy = [];
+          var gdx = [];
+          var gdy = [];
+          var gal = [];
+          var glit = [];
+          var gwarp = [];
+          var gcols = 0;
+          var grows = 0;
+          var gcx = 500;
+          var gcy = 500;
+          var gmax = 700;
+          var gridOn = false;
+          var patterns = {};
+          if (grid) {
+            gcols = grid.cols;
+            grows = grid.rows;
+            var cellW = (grid.x1 - grid.x0) / gcols;
+            var cellH = (grid.y1 - grid.y0) / grows;
+            for (var gr = 0; gr < grows; gr++) {
+              for (var gc = 0; gc < gcols; gc++) {
+                gx.push(grid.x0 + (gc + 0.5) * cellW);
+                gy.push(grid.y0 + (gr + 0.5) * cellH);
+                gdx.push(0);
+                gdy.push(0);
+                gal.push(0);
+                glit.push(0);
+                gwarp.push(0);
+              }
+            }
+            gcx = (grid.x0 + grid.x1) / 2;
+            gcy = (grid.y0 + grid.y1) / 2;
+            gmax = Math.sqrt(Math.pow(grid.x1 - grid.x0, 2) + Math.pow(grid.y1 - grid.y0, 2)) / 2;
+          }
+          Object.keys(spec.patterns || {}).forEach(function (id) {
+            var def = spec.patterns[id];
+            patterns[id] = {
+              idx: def.pts.map(function (pt) {
+                return pt[1] * gcols + pt[0];
+              }),
+              edges: def.edges || []
+            };
+          });
+
+          function mirrorOffsets(id) {
+            var pat = patterns[id];
+            if (!pat) return null;
+            var sx = 0;
+            var sy = 0;
+            pat.idx.forEach(function (gi) {
+              sx += gx[gi];
+              sy += gy[gi];
+            });
+            sx /= pat.idx.length;
+            sy /= pat.idx.length;
+            return pat.idx.map(function (gi) {
+              return [gx[gi] - sx, gy[gi] - sy];
+            });
+          }
+
+          function stepGrid() {
+            gridOn = false;
+            var p = S.grid;
+            if (!grid || !p || p.a < 0.01) return;
+            gridOn = true;
+            var warps = p.warp
+              ? Object.keys(p.warp).map(function (key) {
+                  return p.warp[key];
+                })
+              : [];
+            var i;
+            for (i = 0; i < glit.length; i++) glit[i] = 0;
+            Object.keys(patterns).forEach(function (id) {
+              var value = p.lit ? p.lit[id] || 0 : 0;
+              if (value < 0.01) return;
+              patterns[id].idx.forEach(function (gi) {
+                glit[gi] = Math.max(glit[gi], value);
+              });
+            });
+            for (i = 0; i < gx.length; i++) {
+              var x = gx[i];
+              var y = gy[i];
+              var wx = 0;
+              var wy = 0;
+              for (var w = 0; w < warps.length; w++) {
+                var q = warps[w];
+                if (Math.abs(q.amp) < 0.004) continue;
+                var vx = x - q.x;
+                var vy = y - q.y;
+                var d = Math.sqrt(vx * vx + vy * vy) || 1;
+                var s = d / q.r;
+                var f = q.amp * q.r * 0.5 * s * Math.exp(-s * s);
+                wx += (vx / d) * f;
+                wy += (vy / d) * f;
+              }
+              gdx[i] = x + wx;
+              gdy[i] = y + wy;
+              gwarp[i] = Math.sqrt(wx * wx + wy * wy);
+              var d0 = Math.sqrt((x - gcx) * (x - gcx) + (y - gcy) * (y - gcy)) / gmax;
+              gal[i] = clamp((p.build * 1.35 - d0) * 5, 0, 1);
+            }
+          }
+
+          /* ---------- Punktwolken ---------- */
+          var byId = {};
+          var clouds = [];
+          var rasters = [];
+          var streams = [];
+          var hops = [];
+          var ties = [];
+          var flyers = [];
+          var pulses = [];
+          var feedAcc = {};
+
+          function makeCloud(id, def) {
+            var r = artRandom((def.seed || 1) * 977 + 13);
+            var puzzle = def.puzzle || [];
+            var order = puzzle.map(function (unused, k) {
+              return k;
+            });
+            for (var s = order.length - 1; s > 0; s--) {
+              var j = Math.floor(r() * (s + 1));
+              var tmp = order[s];
+              order[s] = order[j];
+              order[j] = tmp;
+            }
+            var nodes = [];
+            var total = def.max + puzzle.length;
+            for (var i = 0; i < total; i++) {
+              var u1 = r();
+              var u2 = r();
+              var u3 = r();
+              var u4 = r();
+              var u5 = r();
+              var pz = i >= def.max ? i - def.max : -1;
+              nodes.push({
+                i: i,
+                pz: pz,
+                zr: pz >= 0 ? order.indexOf(pz) : 0,
+                x: 500,
+                y: 500,
+                fx: 500,
+                fy: 500,
+                m: 1,
+                al: 0,
+                live: false,
+                learn: 0,
+                env: 1,
+                vis: 0,
+                ph: u1 * TAU,
+                w: (0.12 + u2 * 0.26) * (u3 < 0.5 ? -1 : 1),
+                rho: Math.sqrt(0.14 + 0.86 * u4),
+                k: 0.3 + u2 * 0.5,
+                ph2: u3 * TAU,
+                jit: u5 - 0.5,
+                lane: 0.5 + 0.42 * u4,
+                scale: 0.8 + u5 * 0.45,
+                aspect: 0.82 + u2 * 0.36,
+                tilt: u1 * Math.PI,
+                near: []
+              });
+            }
+            return {
+              id: id,
+              def: def,
+              kind: "cloud",
+              nodes: nodes,
+              sig: "",
+              links: [],
+              list: [],
+              reach: 120,
+              senseAcc: 0,
+              spkAcc: 0,
+              on: false,
+              mirror: null
+            };
+          }
+
+          Object.keys(spec.groups || {}).forEach(function (id) {
+            var def = spec.groups[id];
+            var group = null;
+            if (def.kind === "cloud") {
+              group = makeCloud(id, def);
+              group.mirror = def.mirror ? mirrorOffsets(def.mirror) : null;
+              clouds.push(group);
+            } else if (def.kind === "raster") {
+              group = { id: id, def: def, kind: "raster", sparks: [], acc: 0, on: false };
+              rasters.push(group);
+            } else if (def.kind === "stream") {
+              group = { id: id, def: def, kind: "stream", on: false };
+              streams.push(group);
+            }
+            if (group) byId[id] = group;
+          });
+
+          function put(p, x, y) {
+            var c = Math.cos(p.rot || 0);
+            var s = Math.sin(p.rot || 0);
+            OUT.x = p.x + x * c - y * s;
+            OUT.y = p.y + x * s + y * c;
+          }
+
+          var FORMS = {
+            blob: function (n, p, t) {
+              var a = n.ph + t * n.w * p.spd;
+              var r = n.rho * (0.8 + 0.2 * Math.sin(t * n.k * p.spd + n.ph2));
+              put(p, Math.cos(a) * r * p.rx, Math.sin(a) * r * p.ry);
+            },
+            ring: function (n, p, t) {
+              var a = (n.i / Math.max(1, p.n)) * TAU + t * 0.34 * p.spd;
+              var r = 0.94 + 0.06 * Math.sin(t * n.k + n.ph2);
+              put(p, Math.cos(a) * r * p.rx, Math.sin(a) * r * p.ry);
+            },
+            order: function (n, p, t, g) {
+              var puzzleCount = (g.def.puzzle || []).length;
+              var live = Math.max(1, p.n) + (p.puz ? p.puz.solved * puzzleCount : 0);
+              var ring = 0;
+              var start = 0;
+              var capacity = 1;
+              while (n.i >= start + capacity && ring < 8) {
+                start += capacity;
+                ring++;
+                capacity = 7 * ring;
+              }
+              var inRing = Math.min(capacity, Math.max(1, live - start));
+              var a = ((n.i - start) / inRing) * TAU + t * 0.2 * p.spd;
+              var r = ring * (p.rx / 2);
+              put(p, Math.cos(a) * r, Math.sin(a) * r * (p.ry / p.rx));
+            },
+            poly: function (n, p, t) {
+              var count = Math.max(1, p.n);
+              var sides = Math.max(3, Math.round(p.sides));
+              var f = (((n.i / count + t * 0.035 * p.spd) % 1) + 1) % 1;
+              var s = f * sides;
+              var k = Math.floor(s);
+              var u = s - k;
+              var a0 = (k / sides) * TAU - Math.PI / 2;
+              var a1 = ((k + 1) / sides) * TAU - Math.PI / 2;
+              put(
+                p,
+                (Math.cos(a0) + (Math.cos(a1) - Math.cos(a0)) * u) * p.rx,
+                (Math.sin(a0) + (Math.sin(a1) - Math.sin(a0)) * u) * p.ry
+              );
+            },
+            loose: function (n, p, t) {
+              var count = Math.max(1, p.n);
+              var a = ((n.i + 0.5) / count) * TAU + n.jit * 0.45 + Math.sin(t * 0.21 + n.ph) * 0.03;
+              var r = p.rx * (0.62 + 0.38 * ((n.lane - 0.5) / 0.42)) * (1 + 0.025 * Math.sin(t * 0.33 + n.ph2));
+              put(p, Math.cos(a) * r, Math.sin(a) * r * (p.ry / p.rx));
+            },
+            frame: function (n, p, t) {
+              var count = Math.max(1, p.n);
+              var a = ((n.i + 0.5) / count) * TAU + t * 0.02 * p.spd;
+              put(p, Math.cos(a) * p.rx, Math.sin(a) * p.ry);
+            },
+            row: function (n, p, t) {
+              var count = Math.max(2, p.n);
+              put(p, (n.i / (count - 1) - 0.5) * 2 * p.rx, Math.sin(t * 0.5 + n.ph) * 3);
+            },
+            flow: function (n, p, t) {
+              var count = Math.max(1, p.n);
+              var f = (((n.i / count + t * 0.02 * p.spd) % 1) + 1) % 1;
+              var a = -f * TAU;
+              put(p, Math.cos(a) * p.rx, Math.sin(a) * p.ry);
+              OUT.env = Math.min(1, f / 0.06, (1 - f) / 0.06);
+            },
+            logoflow: function (n, p, t) {
+              var count = Math.max(1, p.n);
+              var f = (((n.i / count + t * 0.045 * p.spd) % 1) + 1) % 1;
+              var a = -f * TAU;
+              var r = n.lane * (1 + 0.05 * Math.sin(t * n.k + n.ph2));
+              put(p, Math.cos(a) * r * p.rx, Math.sin(a) * r * p.ry);
+              OUT.env = Math.min(1, f / 0.045, (1 - f) / 0.045);
+            }
+          };
+
+          function placeNode(g, p, n, t) {
+            OUT.env = 1;
+            (FORMS[p.form] || FORMS.blob)(n, p, t, g);
+            var mir = p.mir;
+            if (g.mirror && mir && mir.k > 0.004 && n.pz < 0 && n.i < g.mirror.length) {
+              var off = g.mirror[n.i];
+              var mk = smooth(mir.k);
+              OUT.x = lerp(OUT.x, p.x + off[0] + Math.sin(t * 0.9 + n.ph) * 3, mk);
+              OUT.y = lerp(OUT.y, p.y + off[1] + Math.cos(t * 0.8 + n.ph2) * 3, mk);
+            }
+            if (n.pz >= 0 && n.learn < 0.999) {
+              var spot = g.def.puzzle[n.pz];
+              var sx = spot[0] + Math.sin(t * 6.7 + n.ph) * 4.5;
+              var sy = spot[1] + Math.cos(t * 5.9 + n.ph2) * 4.5;
+              var e = smooth(n.learn);
+              OUT.x = lerp(sx, OUT.x, e);
+              OUT.y = lerp(sy, OUT.y, e);
+            }
+          }
+
+          function spawnOrigin(g, p, n) {
+            if (g.def.node === "human") {
+              var parent = g.nodes[(n.i * 5 + 3) % Math.max(1, Math.floor(p.n - 1))];
+              if (parent && parent.live && parent !== n && parent.al > 0.5) return { x: parent.x, y: parent.y };
+            }
+            return { x: p.x, y: p.y };
+          }
+
+          function updateCloud(g, dt, t, snap) {
+            var p = S[g.id];
+            g.on = p.a > 0.02;
+            var sig = p.form + "|" + Math.round(p.sides || 0);
+            if (sig !== g.sig) {
+              if (g.sig && !snap) {
+                g.nodes.forEach(function (n) {
+                  n.fx = n.x;
+                  n.fy = n.y;
+                  n.m = 0;
+                });
+              }
+              g.sig = sig;
+            }
+            var puzzleCount = (g.def.puzzle || []).length;
+            var fade = snap ? 1 : Math.min(1, dt * 3.4);
+            var learnRate = snap ? 1 : Math.min(1, dt * 2.2);
+            g.list.length = 0;
+            for (var i = 0; i < g.nodes.length; i++) {
+              var n = g.nodes[i];
+              var want;
+              if (n.pz >= 0) {
+                var solved = !!(p.puz && puzzleCount && p.puz.solved > (n.zr + 0.5) / puzzleCount);
+                n.learn += ((solved ? 1 : 0) - n.learn) * learnRate;
+                var keep = p.puz && p.puz.keep !== undefined ? clamp(p.puz.keep, 0, 1) : 1;
+                want = solved ? keep : p.puz ? clamp(p.puz.a, 0, 1) : 0;
+              } else {
+                want = clamp(p.n - i, 0, 1);
+              }
+              if (want > 0.5 && !n.live) {
+                n.live = true;
+                if (!snap && n.pz < 0) {
+                  var origin = spawnOrigin(g, p, n);
+                  n.fx = origin.x;
+                  n.fy = origin.y;
+                  n.m = 0;
+                } else {
+                  n.m = 1;
+                }
+              }
+              if (want < 0.03 && n.al < 0.03) n.live = false;
+              n.al += (want - n.al) * fade;
+              placeNode(g, p, n, t);
+              if (n.m < 1) n.m = snap ? 1 : Math.min(1, n.m + dt / 1.1);
+              var blend = n.m < 1 ? smooth(n.m) : 1;
+              n.x = n.fx + (OUT.x - n.fx) * blend;
+              n.y = n.fy + (OUT.y - n.fy) * blend;
+              n.env = OUT.env;
+              n.vis = n.al * n.env * (n.pz >= 0 ? (n.learn > 0.7 ? 1 : 0) : 1);
+              if (n.vis > 0.3) g.list.push(n);
+            }
+          }
+
+          function blocked(a, b, list, dx, dy) {
+            var len2 = dx * dx + dy * dy;
+            var reach = dotU * 2.2;
+            for (var k = 0; k < list.length; k++) {
+              var o = list[k];
+              if (o === a || o === b) continue;
+              var t = ((o.x - a.x) * dx + (o.y - a.y) * dy) / len2;
+              if (t <= 0 || t >= 1) continue;
+              var ox = a.x + t * dx - o.x;
+              var oy = a.y + t * dy - o.y;
+              if (ox * ox + oy * oy < reach * reach) return true;
+            }
+            return false;
+          }
+
+          function buildLinks() {
+            clouds.forEach(function (g) {
+              g.links.length = 0;
+              g.nodes.forEach(function (n) {
+                n.near.length = 0;
+              });
+            });
+            ties.length = 0;
+            clouds.forEach(function (g) {
+              var p = S[g.id];
+              if (!g.on || g.list.length < 2) return;
+              var lk = p.lk === undefined ? 1 : p.lk;
+              if (lk < 0.02) return;
+              var reach = p.reach > 0 ? p.reach : clamp(Math.max(p.rx, p.ry) * 0.8, 70, 170);
+              g.reach = reach;
+              var list = g.list;
+              for (var i = 0; i < list.length; i++) {
+                for (var j = i + 1; j < list.length; j++) {
+                  var a = list[i];
+                  var b = list[j];
+                  var dx = b.x - a.x;
+                  var dy = b.y - a.y;
+                  var d = Math.sqrt(dx * dx + dy * dy);
+                  if (d >= reach || blocked(a, b, list, dx, dy)) continue;
+                  g.links.push({ a: a, b: b, d: d, reach: reach });
+                  a.near.push(b);
+                  b.near.push(a);
+                }
+              }
+            });
+            var tie = S.ties || 0;
+            if (tie < 0.02) return;
+            for (var x = 0; x < clouds.length; x++) {
+              for (var y = x + 1; y < clouds.length; y++) {
+                var g1 = clouds[x];
+                var g2 = clouds[y];
+                if (!g1.on || !g2.on) continue;
+                var cands = [];
+                for (var m = 0; m < g1.list.length; m++) {
+                  for (var q = 0; q < g2.list.length; q++) {
+                    var dd = dist(g1.list[m], g2.list[q]);
+                    if (dd < TIE_REACH) cands.push({ u: g1.list[m], v: g2.list[q], d: dd });
+                  }
+                }
+                cands.sort(function (s, t) {
+                  return s.d - t.d;
+                });
+                var used = [];
+                for (var k = 0; k < cands.length && used.length < 8; k++) {
+                  var c = cands[k];
+                  if (used.indexOf(c.u) !== -1 || used.indexOf(c.v) !== -1) continue;
+                  used.push(c.u);
+                  used.push(c.v);
+                  ties.push({ a: c.u, b: c.v, d: c.d, reach: TIE_REACH });
+                  if (c.d < 170) {
+                    c.u.near.push(c.v);
+                    c.v.near.push(c.u);
+                  }
+                }
+              }
+            }
+          }
+
+          function nextHop(s, back) {
+            var near = s.at.near;
+            var options = near.filter(function (q) {
+              return back || q !== s.from;
+            });
+            if (!options.length) options = near.slice();
+            if (!options.length) return null;
+            var reach = (s.g.reach || 120) * 1.3;
+            var total = 0;
+            var weights = options.map(function (q) {
+              var d = dist(s.at, q) / reach;
+              var w = Math.max(0.05, 1 - d * d);
+              total += w;
+              return w;
+            });
+            var pick = rand() * total;
+            for (var i = 0; i < options.length; i++) {
+              pick -= weights[i];
+              if (pick <= 0) return options[i];
+            }
+            return options[options.length - 1];
+          }
+
+          function stepHops(dt) {
+            clouds.forEach(function (g) {
+              var p = S[g.id];
+              if (!g.on) return;
+              var want = Math.round(p.spk || 0);
+              var have = 0;
+              hops.forEach(function (s) {
+                if (s.g === g && !s.leaving) have++;
+              });
+              g.spkAcc -= dt;
+              if (have < want && g.spkAcc <= 0) {
+                var pool = g.list.filter(function (n) {
+                  return n.near.length > 0;
+                });
+                g.spkAcc = 0.45 + rand() * 0.5;
+                if (pool.length) {
+                  hops.push({
+                    g: g,
+                    at: pool[Math.floor(rand() * pool.length)],
+                    from: null,
+                    to: null,
+                    t: 0,
+                    wait: 0,
+                    stuck: 0,
+                    show: 0,
+                    leaving: false,
+                    life: 6 + rand() * 6
+                  });
+                }
+              } else if (have > want) {
+                for (var k = 0; k < hops.length; k++) {
+                  if (hops[k].g === g && !hops[k].leaving) {
+                    hops[k].leaving = true;
+                    break;
+                  }
+                }
+              }
+            });
+            hops.forEach(function (s) {
+              s.show = s.leaving ? s.show - dt / 0.3 : Math.min(1, s.show + dt / 0.3);
+              s.life -= dt;
+              if (s.life <= 0) s.leaving = true;
+              if (s.leaving) return;
+              if (s.at.vis < 0.3 || !s.g.on) {
+                s.leaving = true;
+                return;
+              }
+              if (s.to) {
+                if (s.to.vis < 0.3 || s.at.near.indexOf(s.to) === -1) {
+                  s.leaving = true;
+                  return;
+                }
+                s.t += (HOP_SPEED * dt) / Math.max(1, dist(s.at, s.to));
+                if (s.t >= 1) {
+                  s.from = s.at;
+                  s.at = s.to;
+                  s.to = null;
+                  s.t = 0;
+                  s.wait = HOP_PAUSE;
+                }
+                return;
+              }
+              s.wait -= dt;
+              if (s.wait > 0) return;
+              s.to = nextHop(s, (S[s.g.id].back || 0) > 0.5);
+              if (s.to) {
+                s.stuck = 0;
+                return;
+              }
+              s.wait = 0.25;
+              s.stuck += 1;
+              if (s.stuck > 6) s.leaving = true;
+            });
+            hops = hops.filter(function (s) {
+              return !s.leaving || s.show > 0;
+            });
+          }
+
+          /* ---------- KI-Raster ---------- */
+          function rasterPoint(p, cols, i, j) {
+            var step = p.s / (cols - 1);
+            return { x: p.x - p.s / 2 + i * step, y: p.y - p.s / 2 + j * step };
+          }
+
+          function stepRaster(g, dt, snap) {
+            var p = S[g.id];
+            g.on = p.a > 0.02;
+            if (snap || !g.on) {
+              g.sparks.length = 0;
+              return;
+            }
+            var cols = g.def.cols;
+            var want = Math.round(p.spk || 0);
+            var alive = 0;
+            g.sparks.forEach(function (s) {
+              if (!s.leaving) alive++;
+            });
+            g.acc -= dt;
+            if (alive < want && g.acc <= 0) {
+              g.acc = 0.4 + rand() * 0.5;
+              g.sparks.push({
+                i: Math.floor(rand() * cols),
+                j: Math.floor(rand() * cols),
+                di: 0,
+                dj: 0,
+                ti: -1,
+                tj: -1,
+                t: 0,
+                wait: 0,
+                show: 0,
+                leaving: false,
+                life: 5 + rand() * 4
+              });
+            } else if (alive > want) {
+              for (var k = 0; k < g.sparks.length; k++) {
+                if (!g.sparks[k].leaving) {
+                  g.sparks[k].leaving = true;
+                  break;
+                }
+              }
+            }
+            g.sparks.forEach(function (s) {
+              s.show = s.leaving ? s.show - dt / 0.3 : Math.min(1, s.show + dt / 0.3);
+              s.life -= dt;
+              if (s.life <= 0) s.leaving = true;
+              if (s.leaving) return;
+              if (s.ti >= 0) {
+                s.t += dt * 4.2;
+                if (s.t >= 1) {
+                  s.di = s.ti - s.i;
+                  s.dj = s.tj - s.j;
+                  s.i = s.ti;
+                  s.j = s.tj;
+                  s.ti = -1;
+                  s.tj = -1;
+                  s.t = 0;
+                  s.wait = 0.08;
+                }
+                return;
+              }
+              s.wait -= dt;
+              if (s.wait > 0) return;
+              var moves = [
+                [1, 0],
+                [-1, 0],
+                [0, 1],
+                [0, -1]
+              ].filter(function (m) {
+                var ni = s.i + m[0];
+                var nj = s.j + m[1];
+                var back = (s.di || s.dj) && m[0] === -s.di && m[1] === -s.dj;
+                return ni >= 0 && nj >= 0 && ni < cols && nj < cols && !back;
+              });
+              if (!moves.length) {
+                s.leaving = true;
+                return;
+              }
+              var straight = moves.filter(function (m) {
+                return m[0] === s.di && m[1] === s.dj;
+              });
+              var pick = straight.length && rand() < 0.5 ? straight[0] : moves[Math.floor(rand() * moves.length)];
+              s.ti = s.i + pick[0];
+              s.tj = s.j + pick[1];
+            });
+            g.sparks = g.sparks.filter(function (s) {
+              return !s.leaving || s.show > 0;
+            });
+          }
+
+          /* ---------- Ziele und Funkenfluege ---------- */
+          function anchorAt(ref) {
+            if (!ref) return null;
+            if (ref.charAt(0) === "@") {
+              var xy = ref.slice(1).split(",");
+              return { x: +xy[0], y: +xy[1], fixed: true };
+            }
+            if (ref.indexOf("grid:") === 0) {
+              var pat = patterns[ref.slice(5)];
+              if (!pat || !gridOn) return null;
+              return { gi: pat.idx[Math.floor(rand() * pat.idx.length)], x: 0, y: 0 };
+            }
+            if (ref.indexOf("grid@") === 0) {
+              if (!grid || !gridOn) return null;
+              var q = ref.slice(5).split(",");
+              var px = +q[0];
+              var py = +q[1];
+              var pr = +q[2];
+              var near = [];
+              for (var i = 0; i < gx.length; i++) {
+                var ddx = gx[i] - px;
+                var ddy = gy[i] - py;
+                if (gal[i] > 0.5 && ddx * ddx + ddy * ddy < pr * pr) near.push(i);
+              }
+              if (!near.length) return null;
+              return { gi: near[Math.floor(rand() * near.length)], x: 0, y: 0 };
+            }
+            var wedge = ref.slice(-6) === ":wedge";
+            var center = wedge || ref.slice(-1) === "@";
+            var id = wedge ? ref.slice(0, -6) : center ? ref.slice(0, -1) : ref;
+            var group = byId[id];
+            if (!group) return null;
+            if (center) return { cg: id, wedge: wedge, x: 0, y: 0 };
+            if (group.kind !== "cloud" || !group.list.length) return null;
+            return { node: group.list[Math.floor(rand() * group.list.length)], x: 0, y: 0 };
+          }
+
+          function readAnchor(an) {
+            if (an.node) {
+              an.x = an.node.x + (an.ox || 0);
+              an.y = an.node.y + (an.oy || 0);
+            } else if (an.gi !== undefined) {
+              an.x = gdx[an.gi];
+              an.y = gdy[an.gi];
+            } else if (an.cg) {
+              var q = S[an.cg];
+              an.x = q.x + (an.wedge ? q.rx * 0.62 : 0);
+              an.y = q.y;
+            }
+          }
+
+          function spawnFlyer(from, to, bounce) {
+            if (flyers.length > 36) return;
+            var a = typeof from === "string" ? anchorAt(from) : from;
+            var b = typeof to === "string" ? anchorAt(to) : to;
+            if (!a || !b) return;
+            if (a.node && a.node === b.node && a.ox === undefined) return;
+            readAnchor(a);
+            readAnchor(b);
+            var d = Math.sqrt((b.x - a.x) * (b.x - a.x) + (b.y - a.y) * (b.y - a.y));
+            flyers.push({ a: a, b: b, t: 0, dur: 0.9 + d / 620, bend: (rand() - 0.5) * 0.3, bounce: bounce });
+          }
+
+          function flyPos(f, s) {
+            var dx = f.b.x - f.a.x;
+            var dy = f.b.y - f.a.y;
+            var d = Math.sqrt(dx * dx + dy * dy) || 1;
+            var bend = f.bend * d * Math.sin(Math.PI * s);
+            return { x: f.a.x + dx * s - (dy / d) * bend, y: f.a.y + dy * s + (dx / d) * bend };
+          }
+
+          function stepFeeds(dt) {
+            var feeds = S.feeds || {};
+            Object.keys(feeds).forEach(function (id) {
+              var f = feeds[id];
+              if (!(f.rate > 0.02) || !f.from || !f.to) return;
+              feedAcc[id] = (feedAcc[id] || 0) + dt * f.rate;
+              if (feedAcc[id] >= 1) {
+                feedAcc[id] -= 1;
+                spawnFlyer(f.from, f.to, (f.bounce || 0) > 0.5);
+              }
+            });
+            for (var i = flyers.length - 1; i >= 0; i--) {
+              var f2 = flyers[i];
+              f2.t += dt / f2.dur;
+              readAnchor(f2.a);
+              readAnchor(f2.b);
+              if (f2.t >= 1) {
+                pulses.push({ x: f2.b.x, y: f2.b.y, t: 0 });
+                if (f2.bounce) {
+                  flyers.push({ a: f2.b, b: f2.a, t: 0, dur: f2.dur, bend: -f2.bend, bounce: false });
+                }
+                flyers.splice(i, 1);
+              }
+            }
+            for (var k = pulses.length - 1; k >= 0; k--) {
+              pulses[k].t += dt / 0.7;
+              if (pulses[k].t >= 1) pulses.splice(k, 1);
+            }
+          }
+
+          function stepSense(dt) {
+            clouds.forEach(function (g) {
+              var p = S[g.id];
+              if (!g.on || !(p.sense > 0.02) || !g.list.length || !p.arc) return;
+              g.senseAcc += dt * p.sense;
+              if (g.senseAcc < 1) return;
+              g.senseAcc -= 1;
+              var n = g.list[Math.floor(rand() * g.list.length)];
+              var dir = g.def.arcDir !== undefined ? g.def.arcDir : Math.atan2(n.y - p.y, n.x - p.x);
+              var far = p.arc.r * 1.9;
+              spawnFlyer(
+                { node: n, ox: Math.cos(dir) * far, oy: Math.sin(dir) * far, x: 0, y: 0 },
+                { node: n, x: 0, y: 0 },
+                false
+              );
+            });
+          }
+
+          /* ---------- Zeichnen ---------- */
+          var cssW = 0;
+          var unit = 1;
+          var dotU = 6;
+          var lineU = 1.4;
+          var sparkU = 3.8;
+          var rimU = 1.2;
+          var baseScale = 1;
+
+          function dimOf(id) {
+            if (!focusSet || focusMix < 0.01) return 1;
+            return focusSet[id] ? 1 : 1 - 0.4 * focusMix;
+          }
+
+          function dot(x, y, r) {
+            ctx.beginPath();
+            ctx.arc(x, y, Math.max(0.1, r), 0, TAU);
+            ctx.fill();
+          }
+
+          function ringAt(x, y, r) {
+            ctx.beginPath();
+            ctx.arc(x, y, Math.max(0.1, r), 0, TAU);
+            ctx.stroke();
+          }
+
+          function seg(x1, y1, x2, y2) {
+            ctx.beginPath();
+            ctx.moveTo(x1, y1);
+            ctx.lineTo(x2, y2);
+            ctx.stroke();
+          }
+
+          function roundedRect(x, y, w, h, r) {
+            ctx.beginPath();
+            ctx.moveTo(x + r, y);
+            ctx.arcTo(x + w, y, x + w, y + h, r);
+            ctx.arcTo(x + w, y + h, x, y + h, r);
+            ctx.arcTo(x, y + h, x, y, r);
+            ctx.arcTo(x, y, x + w, y, r);
+            ctx.closePath();
+          }
+
+          function drawSpark(x, y, a, fill, rim) {
+            if (a < 0.02) return;
+            ctx.globalAlpha = Math.min(1, a);
+            ctx.fillStyle = rim;
+            dot(x, y, sparkU + rimU);
+            ctx.fillStyle = fill;
+            dot(x, y, sparkU);
+          }
+
+          function drawGrid() {
+            var p = S.grid;
+            var a0 = p.a * dimOf("grid");
+            var base = dotU * 0.5;
+            var order = p.order || 0;
+            var i;
+            ctx.fillStyle = "#111";
+            for (i = 0; i < gx.length; i++) {
+              var al = gal[i];
+              if (al < 0.02) continue;
+              var lit = glit[i];
+              var boost = order > 0.01 ? clamp((order * 1.5 - gx[i] / 1000) * 4, 0, 1) : 0;
+              ctx.globalAlpha = Math.min(1, a0 * al * (0.34 + 0.55 * lit + 0.3 * boost));
+              dot(gdx[i], gdy[i], base * (1 + lit * 1.3 + boost * 0.45));
+            }
+            ctx.strokeStyle = "#111";
+            ctx.lineWidth = lineU;
+            var total = gx.length;
+            var mesh = (p.mesh || 0) * a0;
+            if (mesh > 0.02) {
+              for (i = 0; i < total; i++) {
+                if (gwarp[i] < 2) continue;
+                if ((i % gcols) + 1 < gcols) meshLine(i, i + 1, mesh);
+                if (i + gcols < total) meshLine(i, i + gcols, mesh);
+              }
+            }
+            Object.keys(patterns).forEach(function (id) {
+              var value = p.lit ? p.lit[id] || 0 : 0;
+              if (value < 0.02) return;
+              ctx.globalAlpha = Math.min(1, value * a0 * 0.5);
+              patterns[id].edges.forEach(function (e) {
+                var u = patterns[id].idx[e[0]];
+                var v = patterns[id].idx[e[1]];
+                seg(gdx[u], gdy[u], gdx[v], gdy[v]);
+              });
+            });
+            var count = gx.length;
+            Object.keys(p.net || {}).forEach(function (id) {
+              var net = p.net[id];
+              if (!(net.a > 0.02) || !(net.r > 10)) return;
+              for (var k = 0; k < count; k++) {
+                if ((k % gcols) + 1 < gcols) netLine(k, k + 1, net, a0);
+                if (k + gcols < count) netLine(k, k + gcols, net, a0);
+              }
+            });
+          }
+
+          function meshLine(i, j, a0) {
+            var m = Math.min(gwarp[i], gwarp[j]);
+            if (m < 2) return;
+            var al = a0 * Math.min(1, m / 24) * 0.3 * Math.min(gal[i], gal[j]);
+            if (al < 0.02) return;
+            ctx.globalAlpha = al;
+            seg(gdx[i], gdy[i], gdx[j], gdy[j]);
+          }
+
+          function netLine(i, j, net, a0) {
+            var mx = (gdx[i] + gdx[j]) / 2;
+            var my = (gdy[i] + gdy[j]) / 2;
+            var dm = Math.sqrt((mx - net.x) * (mx - net.x) + (my - net.y) * (my - net.y)) / net.r;
+            if (dm >= 1) return;
+            var al = net.a * a0 * Math.min(gal[i], gal[j]) * (1 - dm * dm * dm) * 0.55;
+            if (al < 0.02) return;
+            ctx.globalAlpha = al;
+            seg(gdx[i], gdy[i], gdx[j], gdy[j]);
+          }
+
+          function drawReality(g) {
+            var p = S[g.id];
+            var c = p.circ;
+            if (!c || c.a < 0.02) return;
+            var prog = clamp(c.draw, 0, 1);
+            if (prog < 0.01) return;
+            var a = c.a * dimOf(g.id);
+            ctx.save();
+            ctx.globalAlpha = a * 0.16 * smooth(prog * 1.3 - 0.3);
+            ctx.fillStyle = "#fff";
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, Math.max(1, c.r), 0, TAU);
+            ctx.fill();
+            ctx.globalAlpha = Math.min(1, a * 0.8);
+            ctx.strokeStyle = "#111";
+            ctx.lineWidth = lineU * 1.15;
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, Math.max(1, c.r), -Math.PI / 2, -Math.PI / 2 + TAU * prog);
+            ctx.stroke();
+            ctx.restore();
+          }
+
+          function drawDeco(g) {
+            var p = S[g.id];
+            var d = p.deco;
+            if (!d || (d.c < 0.02 && d.w < 0.02) || p.rx < 5) return;
+            var dim = dimOf(g.id);
+            var prog = clamp(d.draw, 0, 1);
+            var scaleLogo = p.rx / 512;
+            ctx.save();
+            ctx.translate(p.x, p.y);
+            ctx.scale(scaleLogo, scaleLogo);
+            ctx.translate(-512, -512);
+            if (d.c > 0.02 && prog > 0.01) {
+              ctx.strokeStyle = "#111";
+              ctx.globalAlpha = Math.min(1, d.c * dim * 0.9);
+              ctx.lineWidth = Math.max(20.5 * d.k, (lineU * 1.1) / scaleLogo);
+              ctx.beginPath();
+              ctx.arc(512, 512, 501.54, -Math.PI / 2, -Math.PI / 2 + TAU * prog);
+              ctx.stroke();
+              ctx.lineWidth = Math.max(20.2 * d.k, (lineU * 1.1) / scaleLogo);
+              ctx.beginPath();
+              ctx.arc(512, 512, 192.19, -Math.PI / 2, -Math.PI / 2 + TAU * prog);
+              ctx.stroke();
+            }
+            if (d.w > 0.02 && wedgePath) {
+              ctx.globalAlpha = Math.min(1, d.w * dim);
+              ctx.fillStyle = "#111";
+              ctx.fill(wedgePath);
+            }
+            ctx.restore();
+          }
+
+          function carrying(L) {
+            for (var i = 0; i < hops.length; i++) {
+              var s = hops[i];
+              if (s.to && ((s.at === L.a && s.to === L.b) || (s.at === L.b && s.to === L.a))) return true;
+            }
+            return false;
+          }
+
+          function drawInk(g, ink, glow) {
+            var p = S[g.id];
+            var ga = p.a * dimOf(g.id);
+            var boost = focusSet && focusSet[g.id] ? 1 + 0.2 * focusMix : 1;
+            var human = g.def.node === "human";
+            var lk = p.lk === undefined ? 1 : p.lk;
+            var i;
+            var n;
+            ctx.lineCap = "round";
+            ctx.lineJoin = "round";
+
+            if (p.outline > 0.02) {
+              ctx.strokeStyle = ink;
+              ctx.lineWidth = lineU;
+              ctx.globalAlpha = Math.min(1, p.outline * ga * 0.7);
+              ctx.beginPath();
+              if (p.form === "poly") {
+                var sides = Math.max(3, Math.round(p.sides));
+                for (i = 0; i <= sides; i++) {
+                  var av = (i / sides) * TAU - Math.PI / 2;
+                  put(p, Math.cos(av) * p.rx, Math.sin(av) * p.ry);
+                  if (i) ctx.lineTo(OUT.x, OUT.y);
+                  else ctx.moveTo(OUT.x, OUT.y);
+                }
+              } else if (g.list.length > 2) {
+                var around = g.list.slice().sort(function (u, v) {
+                  return Math.atan2(u.y - p.y, u.x - p.x) - Math.atan2(v.y - p.y, v.x - p.x);
+                });
+                for (i = 0; i < around.length; i++) {
+                  if (i) ctx.lineTo(around[i].x, around[i].y);
+                  else ctx.moveTo(around[i].x, around[i].y);
+                }
+                ctx.closePath();
+              }
+              ctx.stroke();
+            }
+
+            if (human) {
+              var sp = p.spoke;
+              var pc = p.pc;
+              var arc = p.arc;
+              for (i = 0; i < g.nodes.length; i++) {
+                n = g.nodes[i];
+                var na = ga * n.al * n.env;
+                if (na < 0.03) continue;
+                if (sp && sp.a > 0.02) {
+                  var vx = sp.x - n.x;
+                  var vy = sp.y - n.y;
+                  var vd = Math.sqrt(vx * vx + vy * vy) || 1;
+                  var from = dotU * 2.8;
+                  var to = Math.max(from, vd - (sp.stop || 0));
+                  ctx.strokeStyle = ink;
+                  ctx.lineWidth = lineU;
+                  ctx.globalAlpha = Math.min(1, sp.a * na * 0.5);
+                  seg(n.x + (vx / vd) * from, n.y + (vy / vd) * from, n.x + (vx / vd) * to, n.y + (vy / vd) * to);
+                }
+                if (pc && pc.a > 0.02) {
+                  var vary = pc.vary || 0;
+                  var er = pc.r * lerp(1, n.scale, vary);
+                  var ea = lerp(1, n.aspect, vary);
+                  var tilt = vary * n.tilt;
+                  ctx.strokeStyle = ink;
+                  ctx.lineWidth = lineU * 1.1;
+                  ctx.globalAlpha = Math.min(1, pc.a * na * 0.75);
+                  ctx.beginPath();
+                  ctx.ellipse(n.x, n.y, er, er * ea, tilt, 0, TAU);
+                  ctx.stroke();
+                  if (pc.orb > 0.02) {
+                    var oa = clock * n.w * 4.5 + n.ph;
+                    var ox = Math.cos(oa) * er;
+                    var oy = Math.sin(oa) * er * ea;
+                    drawSpark(
+                      n.x + ox * Math.cos(tilt) - oy * Math.sin(tilt),
+                      n.y + ox * Math.sin(tilt) + oy * Math.cos(tilt),
+                      pc.orb * na,
+                      glow,
+                      ink
+                    );
+                  }
+                }
+                if (arc && arc.a > 0.02) {
+                  var dir = g.def.arcDir !== undefined ? g.def.arcDir : Math.atan2(n.y - p.y, n.x - p.x);
+                  var span = 0.5;
+                  var r0 = arc.r0 !== undefined ? arc.r0 : dotU * 2.8;
+                  ctx.strokeStyle = ink;
+                  ctx.lineWidth = lineU * 1.3;
+                  ctx.globalAlpha = Math.min(1, arc.a * na * 0.85);
+                  ctx.beginPath();
+                  ctx.moveTo(n.x + Math.cos(dir - span) * r0, n.y + Math.sin(dir - span) * r0);
+                  ctx.lineTo(n.x + Math.cos(dir - span) * arc.r, n.y + Math.sin(dir - span) * arc.r);
+                  ctx.arc(n.x, n.y, arc.r, dir - span, dir + span);
+                  ctx.lineTo(n.x + Math.cos(dir + span) * r0, n.y + Math.sin(dir + span) * r0);
+                  ctx.stroke();
+                }
+              }
+            }
+
+            ctx.strokeStyle = ink;
+            ctx.lineWidth = lineU;
+            var mirrorK = g.mirror && p.mir ? p.mir.k : 0;
+            g.links.forEach(function (L) {
+              var f = L.d / L.reach;
+              var al = 0.85 * (1 - f * f) * Math.min(L.a.vis, L.b.vis) * lk * ga;
+              if (carrying(L)) al = Math.max(al, 0.5 * ga);
+              if (mirrorK > 0.01 && (L.a.i >= g.mirror.length || L.b.i >= g.mirror.length)) al *= 1 - 0.5 * mirrorK;
+              if (al < 0.02) return;
+              ctx.globalAlpha = Math.min(1, al * boost);
+              seg(L.a.x, L.a.y, L.b.x, L.b.y);
+            });
+
+            var mir = p.mir;
+            if (g.mirror && mir && mir.k > 0.02) {
+              ctx.lineWidth = lineU * 1.8;
+              patterns[g.def.mirror].edges.forEach(function (e) {
+                var u = g.nodes[e[0]];
+                var v = g.nodes[e[1]];
+                if (!u || !v) return;
+                ctx.globalAlpha = Math.min(1, mir.k * ga * Math.min(u.vis, v.vis) * 0.9);
+                seg(u.x, u.y, v.x, v.y);
+              });
+            }
+
+            var rad = dotU * boost * (human ? 1.2 : 1);
+            for (i = 0; i < g.nodes.length; i++) {
+              n = g.nodes[i];
+              var a = ga * n.al * n.env;
+              if (a < 0.02) continue;
+              if (n.pz >= 0 && n.learn < 0.98) {
+                ctx.globalAlpha = Math.min(1, a * (1 - n.learn));
+                ctx.fillStyle = "rgba(255,255,255,0.55)";
+                ctx.strokeStyle = ink;
+                ctx.lineWidth = lineU * 1.3;
+                ctx.beginPath();
+                ctx.arc(n.x, n.y, rad * 1.3, 0, TAU);
+                ctx.fill();
+                ctx.stroke();
+              }
+              var solid = n.pz >= 0 ? n.learn : 1;
+              if (mirrorK > 0.01 && n.pz < 0 && n.i >= g.mirror.length) solid *= 1 - 0.25 * mirrorK;
+              if (solid > 0.02) {
+                ctx.globalAlpha = Math.min(1, a * solid);
+                ctx.fillStyle = ink;
+                dot(n.x, n.y, rad);
+                if (human) {
+                  ctx.strokeStyle = ink;
+                  ctx.lineWidth = lineU * 1.1;
+                  ctx.globalAlpha = Math.min(1, a * solid * 0.75);
+                  ringAt(n.x, n.y, rad * 2.1);
+                }
+              }
+            }
+
+            hops.forEach(function (s) {
+              if (s.g !== g) return;
+              var x = s.at.x;
+              var y = s.at.y;
+              var seen = s.at.vis;
+              if (s.to) {
+                x = lerp(s.at.x, s.to.x, s.t);
+                y = lerp(s.at.y, s.to.y, s.t);
+                seen = lerp(s.at.vis, s.to.vis, s.t);
+              }
+              drawSpark(x, y, clamp(s.show * seen, 0, 1) * ga, glow, ink);
+            });
+          }
+
+          function drawCloud(g) {
+            var p = S[g.id];
+            if (!g.on) return;
+            var d = p.deco;
+            if (d && d.w > 0.05 && openPath && wedgePath) {
+              var scaleLogo = p.rx / 512;
+              ctx.save();
+              ctx.translate(p.x, p.y);
+              ctx.scale(scaleLogo, scaleLogo);
+              ctx.translate(-512, -512);
+              ctx.clip(openPath, "evenodd");
+              ctx.setTransform(baseScale, 0, 0, baseScale, 0, 0);
+              drawInk(g, "#111", "#fff");
+              ctx.restore();
+              ctx.save();
+              ctx.translate(p.x, p.y);
+              ctx.scale(scaleLogo, scaleLogo);
+              ctx.translate(-512, -512);
+              ctx.clip(wedgePath);
+              ctx.setTransform(baseScale, 0, 0, baseScale, 0, 0);
+              drawInk(g, "#fff", "#111");
+              ctx.restore();
+              return;
+            }
+            drawInk(g, "#111", "#fff");
+          }
+
+          function drawTies() {
+            var tie = S.ties || 0;
+            if (tie < 0.02 || !ties.length) return;
+            ctx.strokeStyle = "#111";
+            ctx.lineWidth = lineU;
+            ties.forEach(function (L) {
+              var f = L.d / L.reach;
+              var al = 0.6 * Math.pow(1 - f * f, 1.5) * tie * Math.min(L.a.vis, L.b.vis);
+              if (al < 0.02) return;
+              ctx.globalAlpha = Math.min(1, al);
+              seg(L.a.x, L.a.y, L.b.x, L.b.y);
+            });
+          }
+
+          function drawRaster(g) {
+            var p = S[g.id];
+            if (!g.on) return;
+            var ga = p.a * dimOf(g.id);
+            var cols = g.def.cols;
+            var step = p.s / (cols - 1);
+            var x0 = p.x - p.s / 2;
+            var y0 = p.y - p.s / 2;
+            var pad = step * 0.75;
+            var i;
+            var j;
+            ctx.strokeStyle = "#111";
+            ctx.lineWidth = lineU;
+            ctx.fillStyle = "#fff";
+            roundedRect(x0 - pad, y0 - pad, p.s + 2 * pad, p.s + 2 * pad, step * 0.5);
+            ctx.globalAlpha = Math.min(1, ga * 0.5);
+            ctx.fill();
+            ctx.globalAlpha = Math.min(1, ga * 0.6);
+            ctx.stroke();
+            ctx.globalAlpha = Math.min(1, ga * 0.22);
+            ctx.beginPath();
+            for (i = 0; i < cols; i++) {
+              ctx.moveTo(x0 + i * step, y0);
+              ctx.lineTo(x0 + i * step, y0 + p.s);
+              ctx.moveTo(x0, y0 + i * step);
+              ctx.lineTo(x0 + p.s, y0 + i * step);
+            }
+            ctx.stroke();
+            ctx.fillStyle = "#111";
+            ctx.globalAlpha = Math.min(1, ga * 0.9);
+            for (i = 0; i < cols; i++) {
+              for (j = 0; j < cols; j++) dot(x0 + i * step, y0 + j * step, dotU * 0.7);
+            }
+            g.sparks.forEach(function (s) {
+              var a = rasterPoint(p, cols, s.i, s.j);
+              var x = a.x;
+              var y = a.y;
+              if (s.ti >= 0) {
+                var b = rasterPoint(p, cols, s.ti, s.tj);
+                x = lerp(a.x, b.x, s.t);
+                y = lerp(a.y, b.y, s.t);
+              }
+              drawSpark(x, y, s.show * ga, "#fff", "#111");
+            });
+          }
+
+          function bezier(p0, p1, p2, p3, u) {
+            var v = 1 - u;
+            return {
+              x: v * v * v * p0.x + 3 * v * v * u * p1.x + 3 * v * u * u * p2.x + u * u * u * p3.x,
+              y: v * v * v * p0.y + 3 * v * v * u * p1.y + 3 * v * u * u * p2.y + u * u * u * p3.y
+            };
+          }
+
+          function drawStream(g) {
+            var p = S[g.id];
+            g.on = p.a > 0.02 && p.draw > 0.01;
+            if (!g.on) return;
+            var from = byId[g.def.from];
+            var to = S[g.def.to];
+            if (!from || !to) return;
+            var ga = p.a * dimOf(g.id);
+            var prog = clamp(p.draw, 0, 1);
+            var end = p.end || 150;
+            var count = g.def.dots || 4;
+            from.nodes.forEach(function (n) {
+              var na = n.al * n.env;
+              if (na < 0.1) return;
+              var p0 = { x: n.x, y: n.y + (g.def.startGap || 60) };
+              var vx = p0.x - to.x;
+              var vy = p0.y - to.y;
+              var vd = Math.sqrt(vx * vx + vy * vy) || 1;
+              var p3 = { x: to.x + (vx / vd) * end, y: to.y + (vy / vd) * end };
+              var dy = p3.y - p0.y;
+              var p1 = { x: p0.x, y: p0.y + dy * 0.55 };
+              var p2 = { x: p3.x + (p0.x - p3.x) * 0.25, y: p3.y - Math.abs(dy) * 0.3 };
+              ctx.strokeStyle = "#111";
+              ctx.lineWidth = lineU;
+              ctx.globalAlpha = Math.min(1, ga * na * 0.4);
+              ctx.beginPath();
+              for (var s = 0; s <= 20; s++) {
+                var q = bezier(p0, p1, p2, p3, (s / 20) * prog);
+                if (s) ctx.lineTo(q.x, q.y);
+                else ctx.moveTo(q.x, q.y);
+              }
+              ctx.stroke();
+              ctx.fillStyle = "#111";
+              for (var k = 0; k < count; k++) {
+                var u = (k / count + clock * 0.1 + n.i * 0.19) % 1;
+                var env = Math.min(1, u / 0.1, (1 - u) / 0.1);
+                var pos = bezier(p0, p1, p2, p3, u * prog);
+                ctx.globalAlpha = Math.min(1, ga * na * (p.flow === undefined ? 1 : p.flow) * env);
+                dot(pos.x, pos.y, dotU * 0.75);
+              }
+            });
+          }
+
+          function drawFlyers() {
+            flyers.forEach(function (f) {
+              var s = smooth(f.t);
+              var env = Math.sin(Math.PI * clamp(f.t, 0, 1));
+              ctx.strokeStyle = "#111";
+              ctx.lineWidth = lineU;
+              ctx.globalAlpha = 0.28 * env;
+              ctx.beginPath();
+              for (var k = 0; k <= 14; k++) {
+                var q = flyPos(f, k / 14);
+                if (k) ctx.lineTo(q.x, q.y);
+                else ctx.moveTo(q.x, q.y);
+              }
+              ctx.stroke();
+              var g1 = flyPos(f, Math.max(0, s - 0.1));
+              var g2 = flyPos(f, Math.max(0, s - 0.05));
+              drawSpark(g1.x, g1.y, env * 0.25, "#fff", "#111");
+              drawSpark(g2.x, g2.y, env * 0.45, "#fff", "#111");
+              var pos = flyPos(f, s);
+              drawSpark(pos.x, pos.y, Math.min(1, env * 3), "#fff", "#111");
+            });
+          }
+
+          function drawPulses() {
+            ctx.strokeStyle = "#111";
+            ctx.lineWidth = lineU;
+            pulses.forEach(function (u) {
+              ctx.globalAlpha = 0.55 * (1 - u.t);
+              ringAt(u.x, u.y, lerp(dotU * 1.2, dotU * 6, smooth(u.t)));
+            });
+          }
+
+          /* ---------- Beschriftungen ---------- */
+          var labelEls = {};
+          Object.keys(spec.labels || {}).forEach(function (id) {
+            var el = document.createElement("div");
+            el.className = "panel-label";
+            layer.appendChild(el);
+            labelEls[id] = { el: el, def: spec.labels[id], on: false, w: 200 };
+          });
+
+          function measureLabels() {
+            if (!cssW) return;
+            Object.keys(labelEls).forEach(function (id) {
+              labelEls[id].w = (labelEls[id].el.offsetWidth / cssW) * 1000;
+            });
+          }
+
+          function relabel() {
+            Object.keys(labelEls).forEach(function (id) {
+              labelEls[id].el.textContent = cfg.label(labelEls[id].def.key);
+            });
+            measureLabels();
+          }
+
+          function labelPoint(L) {
+            var def = L.def;
+            var x = def.x === undefined ? 500 : def.x;
+            var y = def.y === undefined ? 500 : def.y;
+            var p = def.at ? S[def.at] : null;
+            if (p) {
+              var cx = p.x;
+              var cy = p.y;
+              var ext = Math.max(p.rx || 0, p.ry || 0);
+              var group = byId[def.at];
+              if (group && group.kind === "cloud" && def.node !== undefined && group.nodes[def.node]) {
+                cx = group.nodes[def.node].x;
+                cy = group.nodes[def.node].y;
+                ext = 0;
+              } else {
+                if (p.circ && p.circ.a > 0.1) ext = Math.max(ext, p.circ.r);
+                if (p.s) ext = Math.max(ext, p.s / 2 + 20);
+              }
+              var gap = def.gap === undefined ? 24 : def.gap;
+              var side = def.side || "below";
+              if (side === "above") {
+                x = cx;
+                y = cy - ext - gap;
+              } else if (side === "right") {
+                x = cx + ext + gap;
+                y = cy;
+              } else if (side === "left") {
+                x = cx - ext - gap;
+                y = cy;
+              } else if (side === "center") {
+                x = cx;
+                y = cy;
+              } else if (side === "angle") {
+                var rad = ((def.deg || 0) * Math.PI) / 180;
+                x = cx + Math.cos(rad) * (ext + gap);
+                y = cy + Math.sin(rad) * (ext + gap);
+              } else if (side === "out") {
+                var ox = cx - p.x;
+                var oy = cy - p.y;
+                var od = Math.sqrt(ox * ox + oy * oy) || 1;
+                x = cx + (ox / od) * gap;
+                y = cy + (oy / od) * gap;
+              } else {
+                x = cx;
+                y = cy + ext + gap;
+              }
+              x += def.dx || 0;
+              y += def.dy || 0;
+            }
+            var half = (L.w || 200) / 2;
+            return { x: clamp(x, half + 25, 1000 - half - 25), y: clamp(y, 50, 950) };
+          }
+
+          function placeLabels() {
+            var values = S.lab || {};
+            Object.keys(labelEls).forEach(function (id) {
+              var L = labelEls[id];
+              var want = values[id] || 0;
+              if (want < 0.02) {
+                if (L.on) {
+                  L.el.style.visibility = "hidden";
+                  L.el.style.opacity = "0";
+                  L.on = false;
+                }
+                return;
+              }
+              var pos = labelPoint(L);
+              L.el.style.left = (pos.x / 10).toFixed(2) + "%";
+              L.el.style.top = (pos.y / 10).toFixed(2) + "%";
+              L.el.style.opacity = Math.min(1, want).toFixed(3);
+              if (!L.on) {
+                L.el.style.visibility = "visible";
+                L.on = true;
+              }
+            });
+          }
+
+          function draw() {
+            if (!cssW) return;
+            baseScale = canvas.width / 1000;
+            ctx.setTransform(baseScale, 0, 0, baseScale, 0, 0);
+            ctx.clearRect(0, 0, 1000, 1000);
+            if (gridOn) drawGrid();
+            clouds.forEach(drawReality);
+            clouds.forEach(drawDeco);
+            streams.forEach(drawStream);
+            clouds.forEach(drawCloud);
+            drawTies();
+            rasters.forEach(drawRaster);
+            drawFlyers();
+            drawPulses();
+            ctx.globalAlpha = 1;
+            placeLabels();
+          }
+
+          /* ---------- Ablauf ---------- */
+          function setBeat(index) {
+            beat = index;
+            beatT = 0;
+            T = cum[page][index];
+            var list = pages[page][index].focus;
+            focusSet = null;
+            if (list && list.length) {
+              focusSet = {};
+              list.forEach(function (id) {
+                focusSet[id] = true;
+              });
+              focusMix = 1;
+            }
+            cfg.onBeat(index);
+          }
+
+          function begin() {
+            pending = false;
+            if (beats) setBeat(0);
+          }
+
+          function step(dt, snap) {
+            clock += dt;
+            artApproach(S, T, snap ? 1 : 1 - Math.exp(-dt / 0.42), snap ? 1000 : dt);
+            focusMix *= Math.exp(-dt / 1.3);
+            stepGrid();
+            clouds.forEach(function (g) {
+              updateCloud(g, dt, clock, snap);
+            });
+            buildLinks();
+            rasters.forEach(function (g) {
+              stepRaster(g, dt, snap);
+            });
+            if (snap) return;
+            stepHops(dt);
+            stepSense(dt);
+            stepFeeds(dt);
+            if (focused && beat >= 0 && beat < beats) {
+              beatT += dt;
+              if (beatT >= (durations[beat] || 4)) {
+                if (beat < beats - 1) {
+                  setBeat(beat + 1);
+                } else {
+                  beat = beats;
+                  cfg.onBeat(-1);
+                }
+              }
+            }
+          }
+
+          function loop(now) {
+            raf = 0;
+            if (!inView || document.hidden || still.matches) return;
+            var dt = last ? Math.min((now - last) / 1000, 0.1) : 0;
+            last = now;
+            step(dt, false);
+            draw();
+            rafAt = performance.now();
+            raf = requestAnimationFrame(loop);
+          }
+
+          function play() {
+            if (!inView || document.hidden || still.matches) return;
+            if (raf) {
+              /* Ein Bild-Aufruf, der lange nicht kam (Tabwechsel, Energiesparmodus), wird neu angefordert. */
+              if (performance.now() - rafAt < 1500) return;
+              cancelAnimationFrame(raf);
+            }
+            last = 0;
+            rafAt = performance.now();
+            raf = requestAnimationFrame(loop);
+          }
+
+          function snapAll() {
+            hops.length = 0;
+            flyers.length = 0;
+            pulses.length = 0;
+            step(0.016, true);
+            draw();
+          }
+
+          function show(index) {
+            page = index;
+            beats = has(index) ? cum[index].length : 0;
+            beat = -1;
+            beatT = 0;
+            focusSet = null;
+            focusMix = 0;
+            pending = beats > 0;
+            cfg.onBeat(-1);
+            if (still.matches) {
+              T = endState(index);
+              pending = false;
+              beat = beats;
+              snapAll();
+              return;
+            }
+            T = beats ? (index > 0 ? endState(index - 1) : spec.init) : endState(index);
+            if (beats && focused) begin();
+            play();
+          }
+
+          /* ---------- Groesse und Sichtbarkeit ---------- */
+          function fit() {
+            var size = canvas.clientWidth;
+            if (!size) return;
+            var ratio = Math.min(window.devicePixelRatio || 1, 2);
+            var px = Math.round(size * ratio);
+            if (canvas.width !== px || canvas.height !== px) {
+              canvas.width = px;
+              canvas.height = px;
+            }
+            cssW = size;
+            unit = 1000 / size;
+            dotU = Math.max(2.3, size * 0.0056) * unit;
+            lineU = Math.max(1, size * 0.0016) * unit;
+            sparkU = dotU * 0.62;
+            rimU = Math.max(0.9, size * 0.0012) * unit;
+            measureLabels();
+            if (still.matches) snapAll();
+            else draw();
+          }
+
+          var fitTimer = 0;
+          new ResizeObserver(function () {
+            clearTimeout(fitTimer);
+            fitTimer = setTimeout(fit, cssW ? 140 : 0);
+          }).observe(canvas);
+
+          if (window.IntersectionObserver) {
+            new IntersectionObserver(
+              function (entries) {
+                var entry = entries[entries.length - 1];
+                var ratio = entry.isIntersecting ? entry.intersectionRatio : 0;
+                var was = focused;
+                inView = ratio > 0.04;
+                focused = ratio >= 0.6;
+                if (focused && !was && pending) begin();
+                if (inView) play();
+              },
+              { threshold: [0, 0.04, 0.3, 0.6, 0.9] }
+            ).observe(host);
+          } else {
+            inView = true;
+            focused = true;
+          }
+          document.addEventListener("visibilitychange", play);
+          if (still.addEventListener) {
+            still.addEventListener("change", function () {
+              show(page);
+            });
+          }
+
+          var api = {
+            has: has,
+            size: function (index) {
+              return has(index) ? cum[index].length : 0;
+            },
+            show: show,
+            relabel: relabel,
+            setDurations: function (list) {
+              durations = list.slice();
+            },
+            beat: function () {
+              return beat >= 0 && beat < beats ? beat : -1;
+            },
+            goTo: function (index) {
+              if (still.matches || index < 0 || index >= beats) return;
+              pending = false;
+              setBeat(index);
+              play();
+            },
+            replay: function () {
+              if (still.matches || !beats) return;
+              pending = false;
+              setBeat(0);
+              play();
+            }
+          };
+          relabel();
+          return api;
+        }
+
+        /* ---------- Erklaer-Grafiken: Szenen ---------- */
+        function artWith(base, extra) {
+          var out = artClone(base);
+          artMerge(out, extra);
+          return out;
+        }
+
+        function artSwarm(x, y, circle) {
+          return {
+            a: 0,
+            x: x,
+            y: y,
+            rx: 100,
+            ry: 100,
+            rot: 0,
+            n: 0,
+            spd: 1,
+            form: "blob",
+            sides: 3,
+            spk: 0,
+            back: 0,
+            lk: 1,
+            outline: 0,
+            reach: 0,
+            circ: { r: circle || 200, a: 0, draw: 0 },
+            puz: { a: 0, solved: 0, keep: 1 },
+            mir: { k: 0 }
+          };
+        }
+
+        function artFeeds(count) {
+          var feeds = {};
+          for (var i = 1; i <= count; i++) feeds["f" + i] = { from: "", to: "", rate: 0, bounce: 0 };
+          return feeds;
+        }
+
+        var artThema1 = {
+          seed: 5,
+          grid: { cols: 15, rows: 15, x0: 0, y0: 0, x1: 1000, y1: 1000 },
+          patterns: {
+            tri: {
+              pts: [[10, 3], [11, 3], [12, 3], [10, 4], [11, 4], [10, 5]],
+              edges: [[0, 1], [1, 2], [0, 3], [1, 4], [3, 4], [3, 5]]
+            }
+          },
+          groups: {
+            a: {
+              kind: "cloud",
+              max: 24,
+              seed: 3,
+              mirror: "tri",
+              puzzle: [[150, 230], [870, 260], [140, 790], [860, 800], [500, 110], [500, 890], [95, 520], [905, 480]]
+            },
+            b: { kind: "cloud", max: 16, seed: 4 },
+            c: { kind: "cloud", max: 16, seed: 5 },
+            d: { kind: "cloud", max: 10, seed: 6 },
+            e: { kind: "cloud", max: 10, seed: 7 }
+          },
+          labels: {
+            laws: { key: "laws", x: 500, y: 935 },
+            intel: { key: "intelligence", at: "b", side: "above", gap: 28 },
+            reality: { key: "reality", at: "a", side: "angle", deg: 45, gap: 4 },
+            puzzle: { key: "puzzle", x: 175, y: 845 }
+          },
+          init: {
+            grid: {
+              a: 0,
+              build: 0,
+              order: 0,
+              mesh: 0,
+              warp: {
+                a: { x: 280, y: 270, r: 230, amp: 0 },
+                b: { x: 730, y: 320, r: 190, amp: 0 },
+                c: { x: 480, y: 720, r: 200, amp: 0 },
+                d: { x: 400, y: 800, r: 150, amp: 0 },
+                e: { x: 600, y: 800, r: 150, amp: 0 },
+                hit: { x: 300, y: 640, r: 130, amp: 0 }
+              },
+              lit: { tri: 0 },
+              net: {
+                a: { x: 500, y: 500, r: 285, a: 0 },
+                b: { x: 290, y: 700, r: 190, a: 0 },
+                c: { x: 710, y: 700, r: 190, a: 0 },
+                d: { x: 400, y: 800, r: 75, a: 0 },
+                e: { x: 600, y: 800, r: 75, a: 0 }
+              }
+            },
+            a: artSwarm(280, 270, 285),
+            b: artSwarm(730, 320, 190),
+            c: artSwarm(480, 720, 190),
+            d: artSwarm(400, 800, 75),
+            e: artSwarm(600, 800, 75),
+            ties: 0,
+            feeds: artFeeds(8),
+            lab: { laws: 0, intel: 0, reality: 0, puzzle: 0 }
+          },
+          pages: [
+            [
+              {
+                focus: ["grid", "a", "b", "c"],
+                set: {
+                  grid: { a: 1, build: 1 },
+                  a: { a: 1, n: 13, rx: 125, ry: 125, spk: 1 },
+                  b: { a: 1, n: 13, rx: 125, ry: 125, spk: 1 },
+                  c: { a: 1, n: 13, rx: 125, ry: 125, spk: 1 },
+                  lab: { laws: 1 }
+                }
+              },
+              {
+                focus: ["a", "b", "c"],
+                set: {
+                  a: { rx: 200, ry: 82, rot: -0.3, spd: 0.6, n: 15 },
+                  b: { form: "ring", rx: 128, ry: 128, spd: 1.4, n: 10 },
+                  c: { rx: 84, ry: 160, rot: 0.25, spd: 1.2, n: 17 },
+                  lab: { intel: 1 }
+                }
+              },
+              {
+                focus: ["grid"],
+                set: {
+                  grid: { mesh: 1, warp: { a: { amp: 0.7 }, b: { amp: -0.6 }, c: { amp: 0.8 } } }
+                }
+              }
+            ],
+            [
+              {
+                focus: ["grid", "a"],
+                set: {
+                  a: { x: 500, y: 500, rx: 190, ry: 190, rot: 0, spd: 0.9, n: 17 },
+                  b: { x: 860, y: 860, rx: 60, ry: 60, a: 0.5, n: 7, form: "blob", spd: 1 },
+                  c: { x: 140, y: 150, rx: 60, ry: 60, a: 0.5, n: 7, rot: 0, spd: 1 },
+                  grid: {
+                    lit: { tri: 1 },
+                    mesh: 0,
+                    warp: {
+                      a: { x: 500, y: 500, amp: 0.25, r: 260 },
+                      b: { x: 860, y: 860, amp: 0.1, r: 100 },
+                      c: { x: 140, y: 150, amp: 0.1, r: 100 }
+                    }
+                  },
+                  feeds: { f1: { from: "grid:tri", to: "a", rate: 1.6 } },
+                  lab: { intel: 0 }
+                }
+              },
+              {
+                focus: ["a"],
+                set: {
+                  a: { mir: { k: 1 } },
+                  feeds: { f1: { rate: 0.7 } }
+                }
+              },
+              {
+                focus: ["a", "grid"],
+                set: {
+                  feeds: {
+                    f1: { rate: 0 },
+                    f2: { from: "a", to: "grid@300,640,120", rate: 1.5 }
+                  },
+                  grid: { mesh: 0.8, warp: { hit: { amp: 0.9 } } }
+                }
+              },
+              {
+                focus: ["a", "grid"],
+                set: {
+                  feeds: { f2: { rate: 0 } },
+                  a: { circ: { a: 1, draw: 1 } },
+                  grid: { mesh: 0, net: { a: { a: 1 } } },
+                  lab: { reality: 1 }
+                }
+              }
+            ],
+            [
+              {
+                focus: ["a"],
+                set: {
+                  a: { form: "order", n: 22, rx: 210, ry: 210, spd: 1, spk: 2, reach: 125, mir: { k: 0 } },
+                  grid: { lit: { tri: 0 }, warp: { a: { amp: 0 }, hit: { amp: 0 } } }
+                }
+              },
+              {
+                focus: ["a"],
+                set: {
+                  a: { puz: { a: 1 } },
+                  lab: { puzzle: 1 }
+                }
+              },
+              {
+                focus: ["a"],
+                set: {
+                  a: { n: 24, puz: { solved: 1 }, circ: { r: 350 } },
+                  grid: { net: { a: { r: 350 } } },
+                  lab: { puzzle: 0 }
+                }
+              }
+            ],
+            [
+              {
+                focus: ["a", "grid"],
+                set: {
+                  a: { spk: 1 },
+                  feeds: { f3: { from: "a", to: "grid@500,500,430", rate: 2.2 } },
+                  grid: { mesh: 1, warp: { a: { amp: 0.9, r: 300 } } }
+                }
+              },
+              {
+                focus: ["a", "b", "c"],
+                set: {
+                  a: { form: "blob", reach: 0, x: 500, y: 290, rx: 150, ry: 150, n: 10, spd: 0.9, circ: { r: 190 }, puz: { keep: 0 } },
+                  b: { a: 1, x: 290, y: 700, rx: 150, ry: 150, n: 14, spd: 1, spk: 1, circ: { a: 1, draw: 1 } },
+                  c: { a: 1, x: 710, y: 700, rx: 150, ry: 150, n: 14, spd: 1, spk: 1, circ: { a: 1, draw: 1 } },
+                  grid: {
+                    net: { a: { x: 500, y: 290, r: 190 }, b: { a: 1 }, c: { a: 1 } },
+                    warp: {
+                      a: { x: 500, y: 290, amp: 0.7, r: 230 },
+                      b: { x: 290, y: 700, amp: 0.7, r: 230 },
+                      c: { x: 710, y: 700, amp: 0.7, r: 230 }
+                    }
+                  },
+                  feeds: { f3: { rate: 0 } },
+                  lab: { reality: 0 }
+                }
+              },
+              {
+                focus: ["a", "b", "c"],
+                set: {
+                  ties: 1,
+                  a: { rx: 175, ry: 175 },
+                  b: { rx: 175, ry: 175 },
+                  c: { rx: 175, ry: 175 },
+                  feeds: {
+                    f4: { from: "a", to: "b", rate: 0.8, bounce: 1 },
+                    f5: { from: "b", to: "c", rate: 0.8, bounce: 1 },
+                    f6: { from: "c", to: "a", rate: 0.8, bounce: 1 }
+                  }
+                }
+              }
+            ],
+            [
+              {
+                focus: ["a"],
+                set: {
+                  a: { x: 500, y: 300, rx: 210, ry: 210, n: 18, circ: { r: 270 } },
+                  grid: {
+                    net: { a: { x: 500, y: 300, r: 270 } },
+                    warp: { a: { x: 500, y: 300, amp: 0.9, r: 300 } }
+                  },
+                  feeds: { f4: { rate: 0 }, f5: { rate: 0 }, f6: { rate: 0 } }
+                }
+              },
+              {
+                focus: ["a", "b", "c"],
+                set: {
+                  b: { x: 250, y: 740, rx: 105, ry: 105, n: 11, circ: { r: 160 } },
+                  c: { x: 750, y: 740, rx: 105, ry: 105, n: 11, circ: { r: 160 } },
+                  grid: {
+                    net: { b: { x: 250, y: 740, r: 160 }, c: { x: 750, y: 740, r: 160 } },
+                    warp: { b: { x: 250, y: 740, amp: 0.5, r: 200 }, c: { x: 750, y: 740, amp: 0.5, r: 200 } }
+                  },
+                  feeds: {
+                    f4: { from: "a", to: "b", rate: 1.4, bounce: 0 },
+                    f5: { from: "a", to: "c", rate: 1.4, bounce: 0 }
+                  }
+                }
+              },
+              {
+                focus: ["a", "b", "c", "d", "e"],
+                set: {
+                  a: { x: 500, y: 235, rx: 150, ry: 150, circ: { r: 190 } },
+                  b: { x: 320, y: 560, rx: 85, ry: 85, n: 10, circ: { r: 130 } },
+                  c: { x: 680, y: 560, rx: 85, ry: 85, n: 10, circ: { r: 130 } },
+                  d: { a: 1, rx: 52, ry: 52, n: 8, spd: 1, circ: { a: 1, draw: 1 } },
+                  e: { a: 1, rx: 52, ry: 52, n: 8, spd: 1, circ: { a: 1, draw: 1 } },
+                  grid: {
+                    net: {
+                      a: { x: 500, y: 235, r: 190 },
+                      b: { x: 320, y: 560, r: 130 },
+                      c: { x: 680, y: 560, r: 130 },
+                      d: { a: 1 },
+                      e: { a: 1 }
+                    },
+                    warp: {
+                      a: { x: 500, y: 235, amp: 0.6, r: 230 },
+                      b: { x: 320, y: 560, amp: 0.5, r: 170 },
+                      c: { x: 680, y: 560, amp: 0.5, r: 170 },
+                      d: { amp: 0.4 },
+                      e: { amp: 0.4 }
+                    }
+                  },
+                  feeds: {
+                    f4: { from: "a", to: "b", rate: 1.2 },
+                    f5: { from: "a", to: "c", rate: 1.2 },
+                    f6: { from: "b", to: "d", rate: 1 },
+                    f7: { from: "c", to: "e", rate: 1 }
+                  }
+                }
+              }
+            ],
+            [
+              {
+                focus: ["grid"],
+                set: {
+                  grid: { mesh: 0 },
+                  feeds: {
+                    f4: { rate: 0 },
+                    f5: { rate: 0 },
+                    f6: { rate: 0 },
+                    f7: { rate: 0 },
+                    f1: { from: "grid@500,500,560", to: "a", rate: 1 },
+                    f2: { from: "grid@500,500,560", to: "b", rate: 1 },
+                    f3: { from: "grid@500,500,560", to: "c", rate: 1 }
+                  },
+                  lab: { laws: 1 }
+                }
+              },
+              {
+                focus: ["a", "b", "c", "d", "e"],
+                set: {
+                  feeds: {
+                    f1: { rate: 0 },
+                    f2: { rate: 0 },
+                    f3: { rate: 0 },
+                    f4: { from: "a", to: "b", rate: 1.4 },
+                    f5: { from: "a", to: "c", rate: 1.4 },
+                    f6: { from: "b", to: "d", rate: 1.1 },
+                    f7: { from: "c", to: "e", rate: 1.1 }
+                  }
+                }
+              },
+              {
+                focus: ["grid"],
+                set: {
+                  grid: {
+                    order: 1,
+                    warp: { a: { amp: 0 }, b: { amp: 0 }, c: { amp: 0 }, d: { amp: 0 }, e: { amp: 0 } }
+                  },
+                  feeds: { f4: { rate: 0 }, f5: { rate: 0 }, f6: { rate: 0 }, f7: { rate: 0 } }
+                }
+              },
+              {
+                focus: ["a", "b", "c", "d", "e"],
+                set: {
+                  grid: { order: 0 },
+                  a: { form: "ring", rx: 112, ry: 112, n: 14 },
+                  b: { form: "poly", sides: 4, rx: 82, ry: 82, n: 12, outline: 1 },
+                  c: { form: "poly", sides: 3, rx: 82, ry: 82, n: 9, outline: 1 },
+                  d: { form: "poly", sides: 3, rx: 46, ry: 46, n: 6, outline: 1 },
+                  e: { form: "poly", sides: 4, rx: 46, ry: 46, n: 8, outline: 1 }
+                }
+              }
+            ]
+          ]
+        };
+
+        var artThema2 = {
+          seed: 9,
+          groups: {
+            h: { kind: "cloud", node: "human", max: 14, seed: 11 },
+            ring: { kind: "cloud", max: 18, seed: 12 },
+            ai: { kind: "raster", cols: 5 }
+          },
+          labels: {
+            human: { key: "human", at: "h", node: 0, side: "out", gap: 62 },
+            ai: { key: "ai", at: "ai", side: "below", gap: 22 },
+            reality: { key: "reality", at: "h", node: 7, side: "out", gap: 110 },
+            common: { key: "common", at: "ring", side: "below", gap: 26 }
+          },
+          init: {
+            h: artWith(artSwarm(500, 500), {
+              rx: 300,
+              ry: 300,
+              form: "loose",
+              reach: 280,
+              lk: 0.25,
+              pc: { r: 74, a: 0, vary: 0, orb: 0 },
+              arc: { a: 0, r: 92, r0: 74 },
+              spoke: { a: 0, x: 500, y: 360, stop: 135 },
+              sense: 0
+            }),
+            ring: artWith(artSwarm(500, 360), {
+              rx: 130,
+              ry: 130,
+              form: "logoflow",
+              deco: { c: 0, w: 0, draw: 0, k: 0.3 }
+            }),
+            ai: { a: 0, x: 500, y: 500, s: 190, spk: 0 },
+            ties: 0,
+            feeds: artFeeds(4),
+            lab: { human: 0, ai: 0, reality: 0, common: 0 }
+          },
+          pages: [
+            [
+              { focus: ["h"], set: { h: { a: 1, n: 8 }, lab: { human: 1 } } },
+              { focus: ["h"], set: { h: { lk: 1, spk: 1.5 } } },
+              { focus: ["h"], set: { h: { n: 11 } } },
+              {
+                focus: ["h"],
+                set: {
+                  h: { back: 1, spk: 2.5 },
+                  feeds: { f1: { from: "h", to: "h", rate: 1.6, bounce: 1 } }
+                }
+              }
+            ],
+            [
+              { focus: ["ai"], set: { ai: { a: 1, spk: 2 }, lab: { ai: 1 } } },
+              { focus: ["h"], set: { h: { form: "frame", rx: 255, ry: 255, outline: 1, reach: 200, spk: 1 } } }
+            ],
+            [
+              { focus: ["h"], set: { h: { rx: 335, ry: 335, pc: { a: 1 } }, lab: { reality: 1 } } },
+              {
+                focus: ["h"],
+                set: {
+                  h: { lk: 0, outline: 0, spk: 0, arc: { a: 1 }, sense: 2.5 },
+                  feeds: { f1: { rate: 0 } }
+                }
+              },
+              {
+                focus: ["ring", "h", "ai"],
+                set: {
+                  ring: { a: 1, n: 14, spk: 2, deco: { c: 1, draw: 1 } },
+                  h: { spoke: { a: 1 } },
+                  ai: { y: 640, s: 100 },
+                  feeds: { f2: { from: "h", to: "ring@", rate: 3 } },
+                  lab: { common: 1, human: 0 }
+                }
+              }
+            ],
+            [
+              {
+                focus: ["h"],
+                set: {
+                  h: { pc: { r: 70, orb: 1 }, spoke: { a: 0 }, arc: { a: 0.45, r: 86, r0: 70 }, sense: 0 },
+                  feeds: { f2: { rate: 0 } },
+                  lab: { reality: 0 }
+                }
+              },
+              { focus: ["h"], set: { h: { pc: { vary: 1 } } } },
+              { focus: ["h"], set: { h: { form: "flow", n: 11, spd: 1.2, pc: { orb: 0.6 }, arc: { a: 0 } } } },
+              { focus: ["h"], set: { h: { n: 14, spd: 1.6 } } }
+            ]
+          ]
+        };
+
+        var artThema3 = {
+          seed: 13,
+          grid: { cols: 15, rows: 3, x0: 0, y0: 850, x1: 1000, y1: 1000 },
+          groups: {
+            h: { kind: "cloud", node: "human", max: 7, seed: 21, arcDir: Math.PI / 2 },
+            w: { kind: "cloud", max: 20, seed: 22 },
+            paths: { kind: "stream", from: "h", to: "w", dots: 4, startGap: 72 },
+            ai: { kind: "raster", cols: 5 }
+          },
+          labels: {
+            whole: { key: "whole", at: "w", side: "right", gap: 30 },
+            ai: { key: "ai", at: "ai", side: "right", gap: 24 },
+            reality: { key: "reality", x: 820, y: 826 },
+            oc: { key: "oc", at: "w", side: "below", gap: 26 },
+            mandate: { key: "mandate", x: 750, y: 548 }
+          },
+          init: {
+            grid: { a: 0, build: 0, order: 0, mesh: 0, warp: { hit: { x: 500, y: 925, r: 260, amp: 0 } }, lit: {}, net: {} },
+            h: artWith(artSwarm(500, 120), {
+              rx: 360,
+              ry: 360,
+              form: "row",
+              lk: 0,
+              arc: { a: 0, r: 70 },
+              sense: 0
+            }),
+            w: artWith(artSwarm(500, 400), {
+              rx: 150,
+              ry: 150,
+              deco: { c: 0, w: 0, draw: 0, k: 1 }
+            }),
+            paths: { a: 0, draw: 0, flow: 1, end: 105 },
+            ai: { a: 0, x: 500, y: 720, s: 140, spk: 0 },
+            ties: 0,
+            feeds: artFeeds(4),
+            lab: { whole: 0, ai: 0, reality: 0, oc: 0, mandate: 0 }
+          },
+          pages: [
+            [
+              { focus: ["h"], set: { h: { a: 1, n: 7 } } },
+              { focus: ["h"], set: { h: { arc: { a: 1 }, sense: 2 } } },
+              { focus: ["paths"], set: { paths: { a: 1, draw: 1 } } },
+              { focus: ["w", "paths"], set: { w: { a: 1, n: 16, spk: 2 }, lab: { whole: 1 } } },
+              {
+                focus: ["ai", "grid"],
+                set: {
+                  ai: { a: 1, spk: 2 },
+                  grid: { a: 1, build: 1, mesh: 1, warp: { hit: { amp: 1.4 } } },
+                  feeds: {
+                    f1: { from: "w", to: "ai@", rate: 3 },
+                    f2: { from: "ai@", to: "grid@500,925,440", rate: 2.2 }
+                  },
+                  lab: { ai: 1, reality: 1 }
+                }
+              }
+            ],
+            [
+              {
+                focus: ["w"],
+                set: {
+                  w: { form: "logoflow", rx: 170, ry: 170, n: 18, deco: { c: 1, w: 1, draw: 1 } },
+                  paths: { end: 175 },
+                  lab: { whole: 0, oc: 1 }
+                }
+              },
+              { focus: ["w", "paths"], set: { w: { spk: 3 } } },
+              { focus: ["w"], set: { w: { reach: 170, spk: 4 } } },
+              {
+                focus: ["w", "ai"],
+                set: {
+                  feeds: { f1: { rate: 0 }, f3: { from: "w:wedge", to: "ai@", rate: 3.2 } },
+                  lab: { mandate: 1 }
+                }
+              },
+              {
+                focus: ["ai", "grid"],
+                set: {
+                  grid: { order: 1, warp: { hit: { amp: 0 } } },
+                  feeds: { f3: { rate: 1.6 } }
+                }
+              }
+            ]
+          ]
+        };
+
+        var artSpecs = [artThema1, artThema2, artThema3];
+        var arts = [null, null, null];
+
+        var missionBeats = {
+          de: [
+            [
+              ["Trotzdem ist", "denn jede"],
+              ["sich daraus", "und danach handelt", "Sobald das"],
+              ["Alles Neue", "Lernen heißt"],
+              ["Und weil", "beeinflussen sie"],
+              ["kann sie deren", "So stapeln"],
+              ["Je mehr", "Die Physik", "aber innerhalb"]
+            ],
+            [
+              ["Menschen lernen", "bauen aufeinander", "beeinflussen sich"],
+              ["Ihre Umgebung"],
+              ["Dafür sollten", "Was jeder"],
+              ["damit er das Leben", "Und das auch", "damit möglichst viele"]
+            ],
+            [
+              ["Jeder formt", "So kann jeder", "Zusammen ergibt", "Künstliche Intelligenz sollte"],
+              ["OC wird die", "und zu einem", "Daraus entsteht", "mit dem die Realität"]
+            ]
+          ],
+          en: [
+            [
+              ["Even so,", "because each one"],
+              ["forms its own picture", "and acts on it", "As soon as"],
+              ["Everything new", "So learning"],
+              ["And because", "they influence one another"],
+              ["it can help shape", "This is how"],
+              ["The more an intelligence", "Physics always", "but within it"]
+            ],
+            [
+              ["People learn", "build on each other", "influence each other"],
+              ["Its environment"],
+              ["To achieve this", "What each individual"],
+              ["so they can lead", "And that holds", "so that as many"]
+            ],
+            [
+              ["everyone forms their own", "That way, everyone", "Together, this adds", "Artificial intelligence should"],
+              ["OC will become", "and brings them", "From this comes", "for shaping reality"]
+            ]
+          ]
+        };
+
+        function splitBeats(paragraph, anchors) {
+          var cuts = [0];
+          var from = 0;
+          for (var i = 0; i < anchors.length; i++) {
+            var at = paragraph.indexOf(anchors[i], from);
+            if (at < 0) return null;
+            cuts.push(at);
+            from = at + 1;
+          }
+          cuts.push(paragraph.length);
+          var parts = [];
+          for (var j = 0; j < cuts.length - 1; j++) parts.push(paragraph.slice(cuts[j], cuts[j + 1]));
+          return parts;
+        }
+
+        function keepBeatInView(text, el) {
+          if (text.scrollHeight <= text.clientHeight + 1) return;
+          var box = text.getBoundingClientRect();
+          var rect = el.getBoundingClientRect();
+          var pad = 8;
+          var delta = 0;
+          if (rect.height > box.height - pad * 2 || rect.top < box.top + pad) delta = rect.top - box.top - pad;
+          else if (rect.bottom > box.bottom - pad) delta = rect.bottom - box.bottom + pad;
+          if (Math.abs(delta) > 1) text.scrollBy({ top: delta, behavior: "smooth" });
+        }
+
+        function applyBeat(index, beat) {
+          var panel = document.querySelector('.panel-copy[data-mission="' + index + '"]');
+          if (!panel) return;
+          var text = panel.querySelector(".panel-text");
+          var els = panel._beatEls || [];
+          text.classList.toggle("is-telling", beat >= 0 && els.length > 0);
+          els.forEach(function (el, i) {
+            el.classList.toggle("is-on", i === beat);
+          });
+          if (beat >= 0 && els[beat]) keepBeatInView(text, els[beat]);
+        }
+
+        function artFor(index) {
+          if (arts[index]) return arts[index];
+          if (!artSpecs[index]) return null;
+          var box = document.querySelector('.panel-art-box[data-art="' + index + '"]');
+          if (!box) return null;
+          arts[index] = startMissionArt({
+            canvas: box.querySelector(".panel-art"),
+            layer: box.querySelector(".panel-labels"),
+            host: box,
+            spec: artSpecs[index],
+            label: function (key) {
+              var labels = copy[lang()].art;
+              return (labels && labels[key]) || key;
+            },
+            onBeat: function (beat) {
+              applyBeat(index, beat);
+            }
+          });
+          return arts[index];
+        }
+
+        function renderMissionText(panel, index, page, chapter) {
+          var text = panel.querySelector(".panel-text");
+          var paragraph = chapter.paragraphs[page];
+          var art = artFor(index);
+          var anchors = ((missionBeats[lang()] || [])[index] || [])[page];
+          var parts = art && art.has(page) && anchors ? splitBeats(paragraph, anchors) : null;
+          text.classList.remove("is-telling");
+          panel._beatEls = [];
+          if (!parts || parts.length !== art.size(page)) {
+            text.textContent = paragraph;
+            text.classList.remove("has-beats");
+            if (art) art.setDurations([]);
+            return;
+          }
+          text.textContent = "";
+          var durations = [];
+          parts.forEach(function (part) {
+            var core = part.trim();
+            var lead = part.match(/^\s*/)[0];
+            var trail = part.match(/\s*$/)[0];
+            if (lead) text.appendChild(document.createTextNode(lead));
+            var span = document.createElement("span");
+            span.className = "panel-beat";
+            span.textContent = core;
+            text.appendChild(span);
+            if (trail) text.appendChild(document.createTextNode(trail));
+            panel._beatEls.push(span);
+            durations.push(Math.max(2.5, Math.min(7, core.split(/\s+/).length * 0.33)));
+          });
+          text.classList.toggle("has-beats", !window.matchMedia("(prefers-reduced-motion: reduce)").matches);
+          art.setDurations(durations);
+        }
+
         function titleLines(title) {
           var lineHeight = parseFloat(getComputedStyle(title).lineHeight);
           if (!lineHeight) return 1;
@@ -1499,7 +3975,19 @@
             missionPage[index] = page;
             title.textContent = chapter.title;
             fitTitle(title);
-            text.textContent = chapter.paragraphs[page];
+            var shownKey = lang() + ":" + page;
+            if (panel._shown !== shownKey) {
+              var pageChanged = panel._page !== page;
+              panel._shown = shownKey;
+              panel._page = page;
+              renderMissionText(panel, index, page, chapter);
+              var art = artFor(index);
+              if (art) {
+                art.relabel();
+                if (pageChanged) art.show(page);
+                else applyBeat(index, art.beat());
+              }
+            }
             panel.querySelector(".panel-count").textContent = (page + 1) + " / " + chapter.paragraphs.length;
             var prev = panel.querySelector("[data-dir='-1']");
             var next = panel.querySelector("[data-dir='1']");
@@ -1523,6 +4011,23 @@
           missionPage[index] = page;
           showMission();
           panel.querySelector(".panel-text").scrollTop = 0;
+        });
+
+        document.querySelector(".slides").addEventListener("click", function (event) {
+          var sentence = event.target.closest(".panel-beat");
+          if (sentence) {
+            var copyPanel = sentence.closest(".panel-copy");
+            var key = Number(copyPanel.dataset.mission);
+            var at = (copyPanel._beatEls || []).indexOf(sentence);
+            var talking = artFor(key);
+            if (talking && at >= 0) talking.goTo(at);
+            return;
+          }
+          var box = event.target.closest(".panel-art-box");
+          if (box) {
+            var replaying = artFor(Number(box.dataset.art));
+            if (replaying) replaying.replay();
+          }
         });
 
         function render() {
@@ -1926,17 +4431,29 @@
         placeLang();
 
         (function watchPanelSwitch() {
-          var query = window.matchMedia("(max-width: calc(100dvh - 1.75rem))");
+          var query = window.matchMedia("(orientation: portrait)");
+          var reduceQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
           var stacked = query.matches;
           var panels = [].slice.call(document.querySelectorAll(".slide-pair .panel"));
+          var timing = { duration: 850, easing: "cubic-bezier(0.4, 0, 0.2, 1)" };
+
+          function layoutStacked() {
+            var group = document.querySelectorAll(".slide-pair .panel");
+            if (group.length < 2) return query.matches;
+            var a = group[0].getBoundingClientRect();
+            var b = group[1].getBoundingClientRect();
+            return Math.abs(a.left - b.left) < 8;
+          }
+
           function remember() {
             if (root.classList.contains("is-resizing")) return;
+            if (layoutStacked() !== stacked) return;
             panels.forEach(function (panel) {
-              if (panel.style.transform || panel._moving) return;
+              if (panel._moving) return;
               var slide = panel.closest(".slide");
               var sr = slide.getBoundingClientRect();
               var rect = panel.getBoundingClientRect();
-              if (!sr.width || !sr.height) return;
+              if (!sr.width || !sr.height || !rect.width) return;
               panel._spot = {
                 x: (rect.left - sr.left) / sr.width,
                 y: (rect.top - sr.top) / sr.height,
@@ -1944,68 +4461,93 @@
               };
             });
           }
-          function frame() {
-            remember();
-            requestAnimationFrame(frame);
+
+          function finish(panel, anim) {
+            if (panel._switchAnim !== anim) return;
+            panel._switchAnim = null;
+            panel._moving = false;
+            clearTimeout(panel._moveTimer);
           }
-          requestAnimationFrame(frame);
-          query.addEventListener("change", function () {
-            if (query.matches === stacked) return;
-            stacked = query.matches;
-            if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+          function play() {
             var spots = panels.map(function (panel) { return panel._spot; });
             root.classList.add("is-resizing");
-            requestAnimationFrame(function () {
-              panels.forEach(function (panel, index) {
-                var spot = spots[index];
-                var slide = panel.closest(".slide");
-                var sr = slide.getBoundingClientRect();
-                var rect = panel.getBoundingClientRect();
-                if (!spot || !sr.width || !sr.height) return;
-                var dx = spot.x * sr.width - (rect.left - sr.left);
-                var dy = spot.y * sr.height - (rect.top - sr.top);
-                var startSize = (spot.s || rect.width / Math.min(sr.width, sr.height)) * Math.min(sr.width, sr.height);
-                var grow = Math.max(0.4, Math.min(2.5, startSize / rect.width));
-                var pad = 8;
-                var visualLeft = rect.left - sr.left + dx;
-                var visualTop = rect.top - sr.top + dy;
-                var visualW = rect.width * grow;
-                var visualH = rect.height * grow;
-                if (visualLeft < pad) dx += pad - visualLeft;
-                if (visualLeft + visualW > sr.width - pad) dx -= visualLeft + visualW - (sr.width - pad);
-                if (visualTop < pad) dy += pad - visualTop;
-                if (visualTop + visualH > sr.height - pad) dy -= visualTop + visualH - (sr.height - pad);
-                panel.style.transition = "none";
-                panel.style.transformOrigin = "0 0";
-                panel.style.transform =
-                  "translate(" + dx.toFixed(2) + "px," + dy.toFixed(2) + "px) scale(" + grow.toFixed(4) + ")";
-              });
-              requestAnimationFrame(function () {
-                root.classList.remove("is-resizing");
-                panels.forEach(function (panel) {
-                  panel.style.transition =
-                    "transform var(--panel-ms) var(--panel-ease), width var(--panel-ms) var(--panel-ease)";
-                  panel.style.transform = "";
-                  panel._moving = true;
-                  clearTimeout(panel._moveTimer);
-                  panel._moveTimer = setTimeout(function () {
-                    panel._moving = false;
-                    panel.style.transition = "";
-                    panel.style.transformOrigin = "";
-                  }, 1000);
-                });
-              });
-            });
-          });
-          panels.forEach(function (panel) {
-            panel.addEventListener("transitionend", function (event) {
-              if (event.propertyName !== "transform") return;
-              clearTimeout(panel._moveTimer);
-              panel._moving = false;
+            void root.offsetWidth;
+            var started = false;
+            panels.forEach(function (panel, index) {
+              var spot = spots[index];
+              var slide = panel.closest(".slide");
+              var sr = slide.getBoundingClientRect();
+              var rect = panel.getBoundingClientRect();
+              if (!spot || !sr.width || !sr.height || !rect.width) return;
+              var dx = spot.x * sr.width - (rect.left - sr.left);
+              var dy = spot.y * sr.height - (rect.top - sr.top);
+              var grow = Math.max(0.4, Math.min(2.5, (spot.s * Math.min(sr.width, sr.height)) / rect.width));
+              var pad = 8;
+              var visualLeft = rect.left - sr.left + dx;
+              var visualTop = rect.top - sr.top + dy;
+              var visualW = rect.width * grow;
+              var visualH = rect.height * grow;
+              if (visualLeft < pad) dx += pad - visualLeft;
+              if (visualLeft + visualW > sr.width - pad) dx -= visualLeft + visualW - (sr.width - pad);
+              if (visualTop < pad) dy += pad - visualTop;
+              if (visualTop + visualH > sr.height - pad) dy -= visualTop + visualH - (sr.height - pad);
+              if (Math.abs(dx) < 0.5 && Math.abs(dy) < 0.5 && Math.abs(grow - 1) < 0.02) return;
+              if (panel._switchAnim) panel._switchAnim.cancel();
+              panel.style.transform = "";
               panel.style.transition = "";
-              panel.style.transformOrigin = "";
+              var anim = panel.animate(
+                [
+                  { transform: "translate3d(" + dx.toFixed(2) + "px, " + dy.toFixed(2) + "px, 0) scale(" + grow.toFixed(4) + ")" },
+                  { transform: "translate3d(0px, 0px, 0) scale(1)" }
+                ],
+                { duration: timing.duration, easing: timing.easing, fill: "both" }
+              );
+              panel._switchAnim = anim;
+              panel._moving = true;
+              started = true;
+              anim.onfinish = function () {
+                finish(panel, anim);
+                anim.cancel();
+              };
+              anim.oncancel = function () {
+                if (panel._switchAnim === anim) panel._switchAnim = null;
+              };
+              clearTimeout(panel._moveTimer);
+              panel._moveTimer = setTimeout(function () { finish(panel, anim); }, timing.duration + 120);
             });
-          });
+            if (!started) {
+              root.classList.remove("is-resizing");
+              return;
+            }
+            requestAnimationFrame(function () {
+              root.classList.remove("is-resizing");
+            });
+          }
+
+          function onMode() {
+            if (query.matches === stacked) return;
+            if (!reduceQuery.matches && layoutStacked() === stacked) return;
+            stacked = query.matches;
+            if (reduceQuery.matches) {
+              remember();
+              return;
+            }
+            play();
+          }
+
+          function frame() {
+            if (query.matches !== stacked) onMode();
+            else remember();
+            requestAnimationFrame(frame);
+          }
+
+          remember();
+          requestAnimationFrame(frame);
+          if (query.addEventListener) query.addEventListener("change", onMode);
+          else if (query.addListener) query.addListener(onMode);
+          window.addEventListener("orientationchange", onMode);
+          window.addEventListener("resize", onMode);
         })();
 
         var chromeOn = false;
